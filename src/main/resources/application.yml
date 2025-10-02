@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: telemedicine
+    datasource:
+      url: jdbc:postgresql://localhost:5432/telemedicine
+      username: postgres
+      password: password
+    jpa:
+      show-sql: true
