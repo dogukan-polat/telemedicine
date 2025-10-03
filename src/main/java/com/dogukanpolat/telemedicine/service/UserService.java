@@ -2,6 +2,7 @@ package com.dogukanpolat.telemedicine.service;
 
 import com.dogukanpolat.telemedicine.dto.user.DoctorRegistrationDto;
 import com.dogukanpolat.telemedicine.dto.user.PatientRegistrationDto;
+import com.dogukanpolat.telemedicine.exception.DuplicateUserException;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
 import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.Patient;
@@ -24,6 +25,9 @@ public class UserService {
     public Doctor registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
         Doctor doctor = userMapper.toDoctor(doctorRegistrationDto);
         UserModel userModel = userMapper.toUser(doctorRegistrationDto.user());
+        if (userRepository.existsByEmail(userModel.getEmail())) {
+            throw new DuplicateUserException("User with email " + userModel.getEmail() + " already exists");
+        }
         userModel.setRole(Role.DOCTOR);
         UserModel savedUser = userRepository.save(userModel);
         doctor.setUser(savedUser);
@@ -33,6 +37,9 @@ public class UserService {
     public Patient registerPatient(PatientRegistrationDto patientRegistrationDto) {
         Patient patient = userMapper.toPatient(patientRegistrationDto);
         UserModel userModel = userMapper.toUser(patientRegistrationDto.user());
+        if (userRepository.existsByEmail(userModel.getEmail())) {
+            throw new DuplicateUserException("User with email " + userModel.getEmail() + " already exists");
+        }
         userModel.setRole(Role.PATIENT);
         UserModel savedUser = userRepository.save(userModel);
         patient.setUser(savedUser);
