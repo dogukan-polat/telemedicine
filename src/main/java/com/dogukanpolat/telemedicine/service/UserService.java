@@ -12,6 +12,7 @@ import com.dogukanpolat.telemedicine.repository.DoctorRepository;
 import com.dogukanpolat.telemedicine.repository.PatientRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Doctor registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
         Doctor doctor = userMapper.toDoctor(doctorRegistrationDto);
@@ -29,6 +31,7 @@ public class UserService {
             throw new DuplicateUserException("User with email " + userModel.getEmail() + " already exists");
         }
         userModel.setRole(Role.DOCTOR);
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserModel savedUser = userRepository.save(userModel);
         doctor.setUser(savedUser);
         return doctorRepository.save(doctor);
@@ -41,6 +44,7 @@ public class UserService {
             throw new DuplicateUserException("User with email " + userModel.getEmail() + " already exists");
         }
         userModel.setRole(Role.PATIENT);
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserModel savedUser = userRepository.save(userModel);
         patient.setUser(savedUser);
         return patientRepository.save(patient);
