@@ -7,6 +7,8 @@ import com.dogukanpolat.telemedicine.model.Patient;
 import com.dogukanpolat.telemedicine.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +21,12 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/doctor/register")
-    public Doctor registerDoctor(@Valid @RequestBody DoctorRegistrationDto doctorRegistrationDto) {
-        return userService.registerDoctor(doctorRegistrationDto);
+    public ResponseEntity<Doctor> registerDoctor(@Valid @RequestBody DoctorRegistrationDto doctorRegistrationDto) {
+        return new ResponseEntity<>(userService.registerDoctor(doctorRegistrationDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/patient/register")
-    public Patient registerPatient(@Valid @RequestBody PatientRegistrationDto patientRegistrationDto) {
-        return userService.registerPatient(patientRegistrationDto);
+    public ResponseEntity<Patient> registerPatient(@Valid @RequestBody PatientRegistrationDto patientRegistrationDto) {
+        return new ResponseEntity<>(userService.registerPatient(patientRegistrationDto), HttpStatus.CREATED);
     }
 }
