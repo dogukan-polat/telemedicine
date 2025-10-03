@@ -37,7 +37,7 @@ public class Doctor {
     private String biography;
 
     @Column(name = "consultation_fee")
-    private Double consultationFee;
+    private BigDecimal consultationFee;
 
     @Column(name = "is_verified")
     private Boolean isVerified;
