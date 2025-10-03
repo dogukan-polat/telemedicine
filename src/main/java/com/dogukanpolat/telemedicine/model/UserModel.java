@@ -4,6 +4,8 @@ import com.dogukanpolat.telemedicine.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -40,9 +42,11 @@ public class UserModel {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDate createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 

@@ -3,6 +3,7 @@ package com.dogukanpolat.telemedicine.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class Patient {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,6 +35,7 @@ public class Patient {
     @Column(name = "allergies")
     private List<String> allergies;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDate createdAt;
 

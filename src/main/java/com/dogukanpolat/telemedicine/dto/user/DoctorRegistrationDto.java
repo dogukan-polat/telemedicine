@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record DoctorRegistrationDto(
-        @Valid UserRegistrationDto userRegistrationDto,
+        @Valid UserRegistrationDto user,
 
         @NotBlank(message = "Medical license number is required")
         @Size(max = 100, message = "Medical license number must be at most 100 characters")

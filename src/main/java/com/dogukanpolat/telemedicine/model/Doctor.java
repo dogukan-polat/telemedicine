@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class Doctor {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -42,6 +44,7 @@ public class Doctor {
     @Column(name = "is_verified")
     private Boolean isVerified;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDate createdAt;
 
