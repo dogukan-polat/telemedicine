@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record PatientRegistrationDto(
-        @Valid UserRegistrationDto userRegistrationDto,
+        @Valid UserRegistrationDto user,
 
         @Size(max = 200, message = "Emergency contact name must be at most 200 characters")
         String emergencyContactName,

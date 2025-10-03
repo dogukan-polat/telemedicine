@@ -32,10 +32,10 @@ public class UserService {
 
     public Patient registerPatient(PatientRegistrationDto patientRegistrationDto) {
         Patient patient = userMapper.toPatient(patientRegistrationDto);
-        UserModel userModel = userMapper.toUser(patientRegistrationDto.userRegistrationDto());
+        UserModel userModel = userMapper.toUser(patientRegistrationDto.user());
         userModel.setRole(Role.PATIENT);
-        userRepository.save(userModel);
-        patient.setUser(userModel);
+        UserModel savedUser = userRepository.save(userModel);
+        patient.setUser(savedUser);
         return patientRepository.save(patient);
     }
 }
