@@ -1,8 +1,6 @@
 package com.dogukanpolat.telemedicine.mappers;
 
-import com.dogukanpolat.telemedicine.dto.user.DoctorRegistrationDto;
-import com.dogukanpolat.telemedicine.dto.user.PatientRegistrationDto;
-import com.dogukanpolat.telemedicine.dto.user.UserRegistrationDto;
+import com.dogukanpolat.telemedicine.dto.user.*;
 import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.Patient;
 import com.dogukanpolat.telemedicine.model.UserModel;
@@ -18,4 +16,8 @@ public interface UserMapper {
     Patient toPatient(PatientRegistrationDto patientRegistrationDto);
 
     Doctor toDoctor(DoctorRegistrationDto doctorRegistrationDto);
+
+    PatientResponseDto toPatientResponse(Patient patient);
+
+    DoctorResponseDto toDoctorResponse(Doctor doctor);
 }

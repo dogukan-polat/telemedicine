@@ -1,7 +1,9 @@
 package com.dogukanpolat.telemedicine.service;
 
 import com.dogukanpolat.telemedicine.dto.user.DoctorRegistrationDto;
+import com.dogukanpolat.telemedicine.dto.user.DoctorResponseDto;
 import com.dogukanpolat.telemedicine.dto.user.PatientRegistrationDto;
+import com.dogukanpolat.telemedicine.dto.user.PatientResponseDto;
 import com.dogukanpolat.telemedicine.exception.DuplicateUserException;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
 import com.dogukanpolat.telemedicine.model.Doctor;
@@ -24,7 +26,7 @@ public class UserService {
     private final DoctorRepository doctorRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Doctor registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
+    public DoctorResponseDto registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
         Doctor doctor = userMapper.toDoctor(doctorRegistrationDto);
         UserModel userModel = userMapper.toUser(doctorRegistrationDto.user());
         if (userRepository.existsByEmail(userModel.getEmail())) {
@@ -34,10 +36,11 @@ public class UserService {
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserModel savedUser = userRepository.save(userModel);
         doctor.setUser(savedUser);
-        return doctorRepository.save(doctor);
+        Doctor savedDoctor = doctorRepository.save(doctor);
+        return userMapper.toDoctorResponse(savedDoctor);
     }
 
-    public Patient registerPatient(PatientRegistrationDto patientRegistrationDto) {
+    public PatientResponseDto registerPatient(PatientRegistrationDto patientRegistrationDto) {
         Patient patient = userMapper.toPatient(patientRegistrationDto);
         UserModel userModel = userMapper.toUser(patientRegistrationDto.user());
         if (userRepository.existsByEmail(userModel.getEmail())) {
@@ -47,6 +50,7 @@ public class UserService {
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         UserModel savedUser = userRepository.save(userModel);
         patient.setUser(savedUser);
-        return patientRepository.save(patient);
+        Patient savedPatieht = patientRepository.save(patient);
+        return userMapper.toPatientResponse(savedPatieht);
     }
 }
