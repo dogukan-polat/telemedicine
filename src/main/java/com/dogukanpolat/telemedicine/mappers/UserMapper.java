@@ -17,7 +17,13 @@ public interface UserMapper {
 
     Doctor toDoctor(DoctorRegistrationDto doctorRegistrationDto);
 
+    @Mapping(target = "firstName", source = "user.firstName")
+    @Mapping(target = "lastName", source = "user.lastName")
+    @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     PatientResponseDto toPatientResponse(Patient patient);
 
+    @Mapping(target = "firstName", source = "user.firstName")
+    @Mapping(target = "lastName", source = "user.lastName")
+    @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     DoctorResponseDto toDoctorResponse(Doctor doctor);
 }
