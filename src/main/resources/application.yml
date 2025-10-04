@@ -7,3 +7,7 @@ spring:
       password: password
     jpa:
       show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400
