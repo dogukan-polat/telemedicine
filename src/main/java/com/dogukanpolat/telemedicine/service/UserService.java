@@ -10,16 +10,14 @@ import com.dogukanpolat.telemedicine.model.enums.Role;
 import com.dogukanpolat.telemedicine.repository.DoctorRepository;
 import com.dogukanpolat.telemedicine.repository.PatientRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
-import com.dogukanpolat.telemedicine.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserMapper userMapper;
 
     private final UserRepository userRepository;
@@ -28,8 +26,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
+
 
     public DoctorResponseDto registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
         Doctor doctor = userMapper.toDoctor(doctorRegistrationDto);
@@ -59,15 +56,5 @@ public class UserService {
         return userMapper.toPatientResponse(savedPatieht);
     }
 
-    public JwtResponseDto login(UserLoginDto userLoginDto) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userLoginDto.email(),
-                        userLoginDto.password()
-                )
-        );
 
-        String token = jwtUtils.generateToken(userLoginDto.email());
-        return new JwtResponseDto(token);
-    }
 }
