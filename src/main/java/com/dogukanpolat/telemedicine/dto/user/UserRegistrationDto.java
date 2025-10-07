@@ -1,10 +1,7 @@
 package com.dogukanpolat.telemedicine.dto.user;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -23,6 +20,7 @@ public record UserRegistrationDto(
         @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
         String lastName,
 
+        @Pattern(regexp = "^\\+?[1-9][0-9]\\d{1,14}", message = "Emergency contact phone must be a valid phone number")
         String phoneNumber,
 
         @Past(message = "Date of birth must be in the past")
