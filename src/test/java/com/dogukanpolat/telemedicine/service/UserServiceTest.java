@@ -282,9 +282,6 @@ public class UserServiceTest {
                 List.of("Penicillin")
         );
 
-        Patient patient = new Patient();
-        when(userMapper.toPatient(patientRegistrationDto)).thenReturn(patient);
-        when(userMapper.toUser(userRegistrationDto)).thenReturn(userModel);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
         // When & Then
