@@ -28,4 +28,24 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
     }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<Map<String, String>> handlePasswordMismatchException(PasswordMismatchException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("status", "400");
+        error.put("error", "Password Mismatch");
+        error.put("message", ex.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleException(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("status", "500");
+        error.put("error", "Internal Server Error");
+        error.put("message", ex.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.internalServerError().body(error);
+    }
 }
