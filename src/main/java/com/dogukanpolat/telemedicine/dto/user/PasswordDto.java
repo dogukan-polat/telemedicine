@@ -10,9 +10,4 @@ public record PasswordDto(
         @NotBlank(message = "Confirm password is required")
         String confirmPassword
 ) {
-    public PasswordDto {
-        if (!password.equals(confirmPassword)) {
-            throw new IllegalArgumentException("Passwords do not match");
-        }
-    }
 }
