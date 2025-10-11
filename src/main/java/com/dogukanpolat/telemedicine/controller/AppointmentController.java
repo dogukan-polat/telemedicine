@@ -1,7 +1,7 @@
 package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.model.Appointment;
-import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
+import com.dogukanpolat.telemedicine.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,26 +13,26 @@ import java.util.UUID;
 @RequestMapping("/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
-    private final AppointmentRepository appointmentRepository;
+    private final AppointmentService appointmentService;
 
     @GetMapping("/patient/{id}")
     public ResponseEntity<List<Appointment>> getAppointmentsByPatientId(@PathVariable UUID id) {
-        return ResponseEntity.ok(appointmentRepository.findByPatientId(id));
+        return ResponseEntity.ok(appointmentService.getAppointmentsByPatientId(id));
     }
 
     @GetMapping("/doctor/{id}")
     public ResponseEntity<List<Appointment>> getAppointmentsByDoctorId(@PathVariable UUID id) {
-        return ResponseEntity.ok(appointmentRepository.findByDoctorId(id));
+        return ResponseEntity.ok(appointmentService.getAppointmentsByDoctorId(id));
     }
 
     @PostMapping
     public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentRepository.save(appointment));
+        return ResponseEntity.ok(appointmentService.createAppointment(appointment));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(@PathVariable UUID id) {
-        appointmentRepository.deleteById(id);
+        appointmentService.deleteAppointment(id);
         return ResponseEntity.noContent().build();
     }
 }
