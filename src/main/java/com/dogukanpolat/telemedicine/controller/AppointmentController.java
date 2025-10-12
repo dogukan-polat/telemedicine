@@ -1,5 +1,6 @@
 package com.dogukanpolat.telemedicine.controller;
 
+import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
 import com.dogukanpolat.telemedicine.model.Appointment;
 import com.dogukanpolat.telemedicine.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
-        return ResponseEntity.ok(appointmentService.createAppointment(appointment));
+    public ResponseEntity<Appointment> createAppointment(@RequestBody AppointmentRequestDto appointmentRequest) {
+        return ResponseEntity.ok(appointmentService.createAppointment(appointmentRequest));
     }
 
     @DeleteMapping("/{id}")
