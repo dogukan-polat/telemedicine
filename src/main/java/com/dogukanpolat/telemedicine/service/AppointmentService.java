@@ -16,6 +16,7 @@ import java.util.UUID;
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final EmailNotificationService emailService;
 
     public List<Appointment> getAppointmentsByPatientId(UUID id) {
         return appointmentRepository.findByPatientId(id);
@@ -29,7 +30,9 @@ public class AppointmentService {
         Appointment appointment = appointmentMapper.toAppointment(appointmentRequest);
         appointment.setId(UUID.randomUUID());
         appointment.setCreatedAt(Instant.now());
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        emailService.sendAppointmentConfirmation(saved);
+        return saved;
     }
 
     public void deleteAppointment(UUID id) {
