@@ -38,4 +38,8 @@ public class AppointmentService {
     public void deleteAppointment(UUID id) {
         appointmentRepository.deleteById(id);
     }
+
+    public Appointment cancelAppointment(UUID id) {
+        return null;
+    }
 }
