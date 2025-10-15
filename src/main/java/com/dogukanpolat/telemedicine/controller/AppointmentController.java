@@ -2,6 +2,7 @@ package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
 import com.dogukanpolat.telemedicine.model.Appointment;
+import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,17 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<Appointment> cancelAppointment(@PathVariable UUID id) {
-        return ResponseEntity.ok(appointmentService.cancelAppointment(id));
+        return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.CANCELLED));
+    }
+
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<Appointment> confirmAppointment(@PathVariable UUID id) {
+        return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.CONFIRMED));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<Appointment> completeAppointment(@PathVariable UUID id) {
+        return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.COMPLETED));
     }
 
     @DeleteMapping("/{id}")

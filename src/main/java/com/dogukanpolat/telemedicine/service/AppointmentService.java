@@ -3,6 +3,7 @@ package com.dogukanpolat.telemedicine.service;
 import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
 import com.dogukanpolat.telemedicine.mappers.AppointmentMapper;
 import com.dogukanpolat.telemedicine.model.Appointment;
+import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,9 @@ public class AppointmentService {
         appointmentRepository.deleteById(id);
     }
 
-    public Appointment cancelAppointment(UUID id) {
-        return null;
+    public Appointment changeAppointmentStatus(UUID id, AppointmentStatus status) {
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Appointment cannot be null"));
+        appointment.setStatus(status);
+        return appointmentRepository.save(appointment);
     }
 }
