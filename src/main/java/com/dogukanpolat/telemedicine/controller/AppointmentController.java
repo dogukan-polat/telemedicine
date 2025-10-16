@@ -4,6 +4,7 @@ import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
 import com.dogukanpolat.telemedicine.model.Appointment;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody AppointmentRequestDto appointmentRequest) {
+    public ResponseEntity<Appointment> createAppointment(@RequestBody @Valid AppointmentRequestDto appointmentRequest) {
         return ResponseEntity.ok(appointmentService.createAppointment(appointmentRequest));
     }
 
