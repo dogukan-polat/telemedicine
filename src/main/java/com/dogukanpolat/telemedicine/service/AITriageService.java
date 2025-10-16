@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +25,15 @@ import java.util.UUID;
 public class AITriageService {
     @Value("${gemini.api-key}")
     private String apiKey;
-    private final Client client = Client.builder().apiKey(apiKey).build();
+    private Client client;
 
     private final AiTriageAuditRepository auditRepository;
     private final PatientRepository patientRepository;
+
+    @PostConstruct
+    public void init() {
+        client = Client.builder().apiKey(apiKey).build();
+    }
 
     public TriageResult analyzeSymptoms(String patientDescription, UUID patientId) {
         try {
