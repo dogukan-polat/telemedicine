@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/register/**").permitAll()
 
+                        //Doctor can analyze patients' symptoms
+                        .requestMatchers("/ai/triage/**").hasRole("DOCTOR")
 
                         .requestMatchers(HttpMethod.POST, "/appointments").hasRole("DOCTOR")
 
