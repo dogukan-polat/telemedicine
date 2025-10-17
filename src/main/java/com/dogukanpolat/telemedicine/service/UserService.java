@@ -37,6 +37,7 @@ public class UserService {
         validateUser(doctorRegistrationDto.user());
         userModel.setRole(Role.DOCTOR);
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
+        userModel.setIsActive(true);
         UserModel savedUser = userRepository.save(userModel);
         doctor.setUser(savedUser);
         Doctor savedDoctor = doctorRepository.save(doctor);
@@ -49,6 +50,7 @@ public class UserService {
         UserModel userModel = userMapper.toUser(patientRegistrationDto.user());
         userModel.setRole(Role.PATIENT);
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
+        userModel.setIsActive(true);
         UserModel savedUser = userRepository.save(userModel);
         patient.setUser(savedUser);
         Patient savedPatieht = patientRepository.save(patient);
