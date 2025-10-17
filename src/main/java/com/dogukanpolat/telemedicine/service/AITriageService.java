@@ -99,7 +99,10 @@ public class AITriageService {
 
     private void auditTriageInteraction(UUID patientId, String input, String rawResponse, TriageResult result) {
         AiTriageAudit audit = new AiTriageAudit();
-        audit.setPatient(patientRepository.findById(patientId).orElseThrow());
+        if (patientId == null) {
+            return;
+        }
+        audit.setPatient(patientRepository.findById(patientId).orElse(null));
         audit.setUserInput(input);
         audit.setAiOutput(rawResponse);
         audit.setUrgencyLevel(result.getUrgency());
