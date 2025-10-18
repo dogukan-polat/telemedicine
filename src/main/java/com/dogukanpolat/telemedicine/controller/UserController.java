@@ -1,9 +1,6 @@
 package com.dogukanpolat.telemedicine.controller;
 
-import com.dogukanpolat.telemedicine.dto.user.DoctorRegistrationDto;
-import com.dogukanpolat.telemedicine.dto.user.DoctorResponseDto;
-import com.dogukanpolat.telemedicine.dto.user.PatientRegistrationDto;
-import com.dogukanpolat.telemedicine.dto.user.PatientResponseDto;
+import com.dogukanpolat.telemedicine.dto.user.*;
 import com.dogukanpolat.telemedicine.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +26,11 @@ public class UserController {
     @PostMapping("/register/patient")
     public ResponseEntity<PatientResponseDto> registerPatient(@Valid @RequestBody PatientRegistrationDto patientRegistrationDto) {
         return new ResponseEntity<>(userService.registerPatient(patientRegistrationDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<Void> registerAdmin(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
+        userService.registerAdmin(userRegistrationDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

@@ -12,6 +12,8 @@ import com.dogukanpolat.telemedicine.repository.DoctorRepository;
 import com.dogukanpolat.telemedicine.repository.PatientRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,9 @@ public class UserService {
     private final DoctorRepository doctorRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${spring.mail.username}")
+    private String adminEmail;
 
 
 
@@ -47,7 +52,12 @@ public class UserService {
         return userMapper.toPatientResponse(savedPatieht);
     }
 
-
+    public void registerAdmin(UserRegistrationDto userRegistrationDto) {
+        if (!userRegistrationDto.email().equals(adminEmail)) {
+            throw new BadCredentialsException("Only admin can register");
+        }
+        registerUser(userRegistrationDto, Role.ADMIN);
+    }
 
     //Helper methods
 
