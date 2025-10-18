@@ -1,5 +1,6 @@
 package com.dogukanpolat.telemedicine.mappers;
 
+import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
 import com.dogukanpolat.telemedicine.dto.user.*;
 import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.Patient;
@@ -26,4 +27,6 @@ public interface UserMapper {
     @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     DoctorResponseDto toDoctorResponse(Doctor doctor);
+
+    UserManagementDto toUserManagementDto(UserModel user);
 }
