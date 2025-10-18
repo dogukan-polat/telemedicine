@@ -33,12 +33,7 @@ public class UserService {
 
     public DoctorResponseDto registerDoctor(DoctorRegistrationDto doctorRegistrationDto) {
         Doctor doctor = userMapper.toDoctor(doctorRegistrationDto);
-        UserModel userModel = userMapper.toUser(doctorRegistrationDto.user());
-        validateUser(doctorRegistrationDto.user());
-        userModel.setRole(Role.DOCTOR);
-        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        userModel.setIsActive(true);
-        UserModel savedUser = userRepository.save(userModel);
+        UserModel savedUser = registerUser(doctorRegistrationDto.user(), Role.DOCTOR);
         doctor.setUser(savedUser);
         Doctor savedDoctor = doctorRepository.save(doctor);
         return userMapper.toDoctorResponse(savedDoctor);
@@ -46,15 +41,23 @@ public class UserService {
 
     public PatientResponseDto registerPatient(PatientRegistrationDto patientRegistrationDto) {
         Patient patient = userMapper.toPatient(patientRegistrationDto);
-        validateUser(patientRegistrationDto.user());
-        UserModel userModel = userMapper.toUser(patientRegistrationDto.user());
-        userModel.setRole(Role.PATIENT);
-        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        userModel.setIsActive(true);
-        UserModel savedUser = userRepository.save(userModel);
+        UserModel savedUser = registerUser(patientRegistrationDto.user(), Role.PATIENT);
         patient.setUser(savedUser);
         Patient savedPatieht = patientRepository.save(patient);
         return userMapper.toPatientResponse(savedPatieht);
+    }
+
+
+
+    //Helper methods
+
+    private UserModel registerUser(UserRegistrationDto userRegistrationDto, Role role) {
+        UserModel userModel = userMapper.toUser(userRegistrationDto);
+        validateUser(userRegistrationDto);
+        userModel.setRole(role);
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
+        userModel.setIsActive(true);
+        return userRepository.save(userModel);
     }
 
     private void validateUser(UserRegistrationDto userRegistrationDto) {
