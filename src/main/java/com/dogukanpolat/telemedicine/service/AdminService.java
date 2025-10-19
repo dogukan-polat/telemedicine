@@ -6,6 +6,7 @@ import com.dogukanpolat.telemedicine.model.enums.Role;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,10 +15,6 @@ import java.util.List;
 public class AdminService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    public void deleteUser(String email) {
-        userRepository.deleteByEmail(email);
-    }
 
     public List<UserManagementDto> getAllUsers() {
        return userRepository.findAll().stream()
@@ -37,5 +34,15 @@ public class AdminService {
                 .filter(user -> user.getRole() == Role.PATIENT)
                 .map(userMapper::toUserManagementDto)
                 .toList();
+    }
+
+
+
+    @Transactional
+    public void deleteUser(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new RuntimeException("User with email " + email + " not found");
+        }
+        userRepository.deleteByEmail(email);
     }
 }
