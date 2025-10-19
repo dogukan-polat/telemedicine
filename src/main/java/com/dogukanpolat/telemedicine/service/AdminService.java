@@ -2,6 +2,7 @@ package com.dogukanpolat.telemedicine.service;
 
 import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
+import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.model.enums.Role;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +38,17 @@ public class AdminService {
                 .toList();
     }
 
-
+    @Transactional
+    public UserManagementDto toggleUserActivity(String email, boolean isActive) {
+        Optional<UserModel> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new RuntimeException("User with email " + email + " not found");
+        }
+        UserModel actualUser = user.get();
+        actualUser.setIsActive(isActive);
+        userRepository.save(actualUser);
+        return userMapper.toUserManagementDto(actualUser);
+    }
 
     @Transactional
     public void deleteUser(String email) {
