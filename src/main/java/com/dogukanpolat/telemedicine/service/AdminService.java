@@ -1,9 +1,11 @@
 package com.dogukanpolat.telemedicine.service;
 
+import com.dogukanpolat.telemedicine.dto.admin.AdminStatsResponseDto;
 import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
 import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.model.enums.Role;
+import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminService {
     private final UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
     private final UserMapper userMapper;
 
     public List<UserManagementDto> getAllUsers() {
@@ -36,6 +39,28 @@ public class AdminService {
                 .filter(user -> user.getRole() == Role.PATIENT)
                 .map(userMapper::toUserManagementDto)
                 .toList();
+    }
+
+    public AdminStatsResponseDto getSystemStats() {
+        long totalUsers = userRepository.count();
+        long totalDoctors = userRepository.findAll().stream()
+                .filter(user -> user.getRole() == Role.DOCTOR)
+                .count();
+        long totalPatients = userRepository.findAll().stream()
+                .filter(user -> user.getRole() == Role.PATIENT)
+                .count();
+        long totalAppointments = appointmentRepository.count();
+        long activeUsers = userRepository.findAll().stream()
+                .filter(user -> Boolean.TRUE.equals(user.getIsActive()))
+                .count();
+
+        return new AdminStatsResponseDto(
+                totalUsers,
+                totalDoctors,
+                totalPatients,
+                totalAppointments,
+                activeUsers
+        );
     }
 
     @Transactional
