@@ -7,6 +7,7 @@ import com.dogukanpolat.telemedicine.mappers.AiTriageMapper;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
 import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.model.enums.Role;
+import com.dogukanpolat.telemedicine.model.enums.UrgencyLevel;
 import com.dogukanpolat.telemedicine.repository.AiTriageAuditRepository;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +74,21 @@ public class AdminService {
 
     public List<AiTriageAuditDto> getAiTriageAudit() {
         return aiTriageAuditRepository.findAll().stream()
+                .map(aiTriageMapper::toAiTriageAuditDto)
+                .toList();
+    }
+
+    public List<AiTriageAuditDto> getTriageAuditsByPatient(UUID patientId) {
+        return aiTriageAuditRepository.findAll().stream()
+                .filter(audit -> audit.getPatient() != null && audit.getPatient().getId().equals(patientId))
+                .map(aiTriageMapper::toAiTriageAuditDto)
+                .toList();
+    }
+
+    public List<AiTriageAuditDto> getTriageAuditsByUrgency(String urgency) {
+        UrgencyLevel urgencyLevel = UrgencyLevel.valueOf(urgency.toUpperCase());
+        return aiTriageAuditRepository.findAll().stream()
+                .filter(audit -> audit.getUrgencyLevel() == urgencyLevel)
                 .map(aiTriageMapper::toAiTriageAuditDto)
                 .toList();
     }

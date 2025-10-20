@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin")
@@ -40,6 +41,16 @@ public class AdminController {
     @GetMapping("/triages")
     public ResponseEntity<List<AiTriageAuditDto>> getAiTriageAudit() {
         return ResponseEntity.ok(adminService.getAiTriageAudit());
+    }
+
+    @GetMapping("/triage-audits/patient/{patientId}")
+    public ResponseEntity<List<AiTriageAuditDto>> getPatientTriageAudits(@PathVariable UUID patientId) {
+        return ResponseEntity.ok(adminService.getTriageAuditsByPatient(patientId));
+    }
+
+    @GetMapping("/triage-audits/urgency/{urgency}")
+    public ResponseEntity<List<AiTriageAuditDto>> getTriageAuditsByUrgency(@PathVariable String urgency) {
+        return ResponseEntity.ok(adminService.getTriageAuditsByUrgency(urgency));
     }
 
     @PatchMapping("/users/{email}/deactivate")
