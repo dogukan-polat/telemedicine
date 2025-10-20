@@ -63,6 +63,18 @@ public class AdminController {
         return new ResponseEntity<>(adminService.toggleUserActivity(email, true), HttpStatus.OK);
     }
 
+    @PatchMapping("/doctors/{medicalLicenseNumber}/verify")
+    public ResponseEntity<Void> verifyDoctor(@PathVariable String medicalLicenseNumber) {
+        adminService.verifyDoctor(medicalLicenseNumber, true);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/doctors/{medicalLicenseNumber}/unverify")
+    public ResponseEntity<Void> unverifyDoctor(@PathVariable String medicalLicenseNumber) {
+        adminService.verifyDoctor(medicalLicenseNumber, false);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/users/{email}")
     public ResponseEntity<Void> deleteUser(@PathVariable String email) {
         adminService.deleteUser(email);

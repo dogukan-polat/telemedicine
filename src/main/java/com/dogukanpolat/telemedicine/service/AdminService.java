@@ -5,11 +5,13 @@ import com.dogukanpolat.telemedicine.dto.admin.AiTriageAuditDto;
 import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
 import com.dogukanpolat.telemedicine.mappers.AiTriageMapper;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
+import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.model.enums.Role;
 import com.dogukanpolat.telemedicine.model.enums.UrgencyLevel;
 import com.dogukanpolat.telemedicine.repository.AiTriageAuditRepository;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
+import com.dogukanpolat.telemedicine.repository.DoctorRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class AdminService {
 
     private final UserMapper userMapper;
     private final AiTriageMapper aiTriageMapper;
+    private final DoctorRepository doctorRepository;
 
 
     public List<UserManagementDto> getAllUsers() {
@@ -103,6 +106,15 @@ public class AdminService {
         actualUser.setIsActive(isActive);
         userRepository.save(actualUser);
         return userMapper.toUserManagementDto(actualUser);
+    }
+
+    @Transactional
+    public void verifyDoctor(String medicalLicenseNumber, boolean isVerified) {
+        Doctor doctor = doctorRepository.findByMedicalLicenseNumber(medicalLicenseNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Doctor not found with medical license number " + medicalLicenseNumber));
+
+        doctor.setIsVerified(isVerified);
+        doctorRepository.save(doctor);
     }
 
     @Transactional
