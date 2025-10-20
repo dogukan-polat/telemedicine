@@ -1,10 +1,13 @@
 package com.dogukanpolat.telemedicine.service;
 
 import com.dogukanpolat.telemedicine.dto.admin.AdminStatsResponseDto;
+import com.dogukanpolat.telemedicine.dto.admin.AiTriageAuditDto;
 import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
+import com.dogukanpolat.telemedicine.mappers.AiTriageMapper;
 import com.dogukanpolat.telemedicine.mappers.UserMapper;
 import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.model.enums.Role;
+import com.dogukanpolat.telemedicine.repository.AiTriageAuditRepository;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
 import com.dogukanpolat.telemedicine.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +22,11 @@ import java.util.Optional;
 public class AdminService {
     private final UserRepository userRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AiTriageAuditRepository aiTriageAuditRepository;
+
     private final UserMapper userMapper;
+    private final AiTriageMapper aiTriageMapper;
+
 
     public List<UserManagementDto> getAllUsers() {
        return userRepository.findAll().stream()
@@ -61,6 +68,12 @@ public class AdminService {
                 totalAppointments,
                 activeUsers
         );
+    }
+
+    public List<AiTriageAuditDto> getAiTriageAudit() {
+        return aiTriageAuditRepository.findAll().stream()
+                .map(aiTriageMapper::toAiTriageAuditDto)
+                .toList();
     }
 
     @Transactional
