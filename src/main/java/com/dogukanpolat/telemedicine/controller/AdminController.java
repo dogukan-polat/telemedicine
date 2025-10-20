@@ -1,6 +1,7 @@
 package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.dto.admin.AdminStatsResponseDto;
+import com.dogukanpolat.telemedicine.dto.admin.AiTriageAuditDto;
 import com.dogukanpolat.telemedicine.dto.admin.UserManagementDto;
 import com.dogukanpolat.telemedicine.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,11 @@ public class AdminController {
     @GetMapping("/stats")
     public ResponseEntity<AdminStatsResponseDto> getSystemStats() {
         return ResponseEntity.ok(adminService.getSystemStats());
+    }
+
+    @GetMapping("/triages")
+    public ResponseEntity<List<AiTriageAuditDto>> getAiTriageAudit() {
+        return ResponseEntity.ok(adminService.getAiTriageAudit());
     }
 
     @PatchMapping("/users/{email}/deactivate")
