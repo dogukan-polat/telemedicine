@@ -1,97 +1,103 @@
-# Telemedicine Application
+# Telemedicine Platform API
 
-A comprehensive telemedicine platform built with Spring Boot that enables secure patient-doctor interactions, appointment management, and healthcare delivery through digital channels.
+A comprehensive telemedicine platform API built with Spring Boot that enables secure patient-doctor interactions, appointment management, and AI-powered symptom triage services.
 
-## 📋 Table of Contents
+## Features
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Database Setup](#database-setup)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Security](#security)
-- [License](#license)
+- 🔐 **JWT-based Authentication & Authorization** - Secure user authentication with role-based access control
+- 👥 **Multi-role User Management** - Support for Patients, Doctors, and Admins
+- 📅 **Appointment Scheduling** - Complete appointment lifecycle management
+- 🤖 **AI-Powered Triage** - Intelligent symptom analysis using Google Gemini AI
+- 📧 **Email Notifications** - Automated email notifications for appointments
+- 📊 **Admin Dashboard** - System statistics and audit trail management
+- 📝 **API Documentation** - Interactive Swagger/OpenAPI documentation
 
-## ✨ Features
+## Tech Stack
 
-- **User Management**
-  - Separate registration for doctors and patients
-  - JWT-based authentication and authorization
-  - Role-based access control (PATIENT, DOCTOR, ADMIN)
+- **Framework**: Spring Boot 3.5.6
+- **Language**: Java 25
+- **Database**: PostgreSQL
+- **Security**: Spring Security with JWT (jjwt 0.13.0)
+- **AI Integration**: Google Gemini API 1.23.0
+- **Email**: Spring Boot Starter Mail (Gmail SMTP)
+- **Migration**: Flyway 11.13.1
+- **Mapping**: MapStruct 1.6.3
+- **Validation**: Spring Boot Starter Validation
+- **Documentation**: SpringDoc OpenAPI 2.8.13
+- **Configuration**: Spring DotEnv 4.0.0
+- **Build Tool**: Maven
+- **Testing**: JUnit 5, Mockito, Spring Boot Test
 
-- **Doctor Features**
-  - Medical license verification
-  - Specialization management
-  - Consultation fee configuration
-  - Professional biography
+## Prerequisites
 
-- **Patient Features**
-  - Emergency contact information
-  - Blood type and allergy tracking
-  - Medical history management
-
-- **Security**
-  - Password encryption with BCrypt
-  - JWT token-based authentication
-  - Secure REST API endpoints
-
-## 🛠 Tech Stack
-
-- **Framework:** Spring Boot 3.5.6
-- **Language:** Java 25
-- **Database:** PostgreSQL
-- **Migration:** Flyway
-- **Security:** Spring Security + JWT (jjwt 0.13.0)
-- **ORM:** Spring Data JPA + Hibernate
-- **Validation:** Jakarta Bean Validation
-- **Documentation:** SpringDoc OpenAPI 3
-- **Build Tool:** Maven
-- **Utilities:** 
-  - Lombok
-  - MapStruct 1.6.3
-  - Spring DotEnv 4.0.0
-
-## 📦 Prerequisites
-
-Before running this application, ensure you have:
-
-- Java 25
+- Java 17 or higher (Java 25 recommended)
+- PostgreSQL 12 or higher
 - Maven 3.6+
-- PostgreSQL 12+
-- Git
+- Gmail account (for email notifications)
+- Google Gemini API key
 
-## 🚀 Installation
+## Getting Started
 
-1. **Clone the repository**
+### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd telemedicine
 ```
 
-2. **Create PostgreSQL database**
+### 2. Database Setup
+
+Create a PostgreSQL database:
+
 ```sql
 CREATE DATABASE telemedicine;
 ```
 
-3. **Create `.env` file in the project root**
-```env
-JWT_SECRET=your-secret-key-here-make-it-at-least-256-bits-long
-```
+The database schema will be automatically created by Flyway migrations when you first run the application.
 
-4. **Build the project**
+#### Database Migrations
+
+The project uses Flyway for database version control. Migrations are located in `src/main/resources/db/migration/`:
+
+- **V1__initial_migration.sql** - Creates the `users` table with UUID support
+- **V2__add_patients_and_doctors.sql** - Creates `patients` and `doctors` tables
+- **V3__add_appointments.sql** - Creates `appointments` table
+- **V4__add_ai_triage_audits.sql** - Creates `ai_triage_audits` table
+
+Migrations run automatically on application startup. To manually run Flyway commands:
+
 ```bash
-mvn clean install
+# Run migrations
+mvn flyway:migrate
+
+# Get migration status
+mvn flyway:info
+
+# Clean database (⚠️ WARNING: Deletes all data)
+mvn flyway:clean
+
+# Repair migration history
+mvn flyway:repair
 ```
 
-## ⚙️ Configuration
+**Note**: Update database credentials in `pom.xml` under the `flyway-maven-plugin` configuration if needed.
 
-### Application Configuration
+### 3. Environment Configuration
 
-Edit `src/main/resources/application.yml`:
+Create a `.env` file in the project root (use `.env.example` as template):
+
+```properties
+JWT_SECRET=your-secret-key-at-least-32-characters
+MAIL_USERNAME=your-gmail@gmail.com
+MAIL_PASSWORD=your-app-specific-password
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+**Note**: For Gmail, you need to generate an [App Password](https://support.google.com/accounts/answer/185833) instead of using your regular password.
+
+### 4. Application Configuration
+
+Update `src/main/resources/application.yml` with your database credentials:
 
 ```yaml
 spring:
@@ -99,145 +105,157 @@ spring:
     url: jdbc:postgresql://localhost:5432/telemedicine
     username: postgres
     password: your-password
-  jpa:
-    show-sql: true
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 86400  # 24 hours in seconds
 ```
 
-### Environment Variables
+### 5. Build and Run
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `JWT_SECRET` | Secret key for JWT token generation (min 256 bits) | Yes |
+```bash
+# Build the project
+mvn clean install
 
-## 🗄️ Database Setup
+# Run the application
+mvn spring-boot:run
+```
 
-The application uses Flyway for database migrations. Migrations are automatically applied on startup.
+The application will start on `http://localhost:8080`
 
-### Manual Migration
+### 6. Access API Documentation
 
-If you need to run migrations manually:
+Once the application is running, visit:
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI Docs: `http://localhost:8080/v3/api-docs`
+
+## API Overview
+
+### Authentication Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/login` | User login | No |
+| POST | `/users/register/doctor` | Register as doctor | No |
+| POST | `/users/register/patient` | Register as patient | No |
+| POST | `/users/register/admin` | Register as admin | No* |
+
+*Admin registration requires email to match configured admin email
+
+### Appointment Endpoints
+
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| GET | `/appointments/patient/{id}` | Get patient appointments | Authenticated |
+| GET | `/appointments/doctor/{id}` | Get doctor appointments | Authenticated |
+| POST | `/appointments` | Create appointment | DOCTOR |
+| PATCH | `/appointments/{id}/cancel` | Cancel appointment | Authenticated |
+| PATCH | `/appointments/{id}/confirm` | Confirm appointment | Authenticated |
+| PATCH | `/appointments/{id}/complete` | Complete appointment | Authenticated |
+| DELETE | `/appointments/{id}` | Delete appointment | ADMIN |
+
+### AI Triage Endpoints
+
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| POST | `/ai/triage/analyze` | Analyze patient symptoms | DOCTOR |
+| POST | `/ai/triage/quick-analyze` | Quick analysis (no patient ID) | DOCTOR |
+
+### Admin Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/admin/users` | Get all users |
+| GET | `/admin/patients` | Get all patients |
+| GET | `/admin/doctors` | Get all doctors |
+| GET | `/admin/stats` | Get system statistics |
+| GET | `/admin/triages` | Get AI triage audits |
+| GET | `/admin/triage-audits/patient/{id}` | Get patient triage audits |
+| GET | `/admin/triage-audits/urgency/{level}` | Get audits by urgency |
+| PATCH | `/admin/users/{email}/activate` | Activate user |
+| PATCH | `/admin/users/{email}/deactivate` | Deactivate user |
+| PATCH | `/admin/doctors/{license}/verify` | Verify doctor |
+| PATCH | `/admin/doctors/{license}/unverify` | Unverify doctor |
+| DELETE | `/admin/users/{email}` | Delete user |
+
+## User Roles
+
+### PATIENT
+- Book and manage appointments
+- Use AI triage services (via doctor)
+- View personal appointment history
+
+### DOCTOR
+- Create and manage appointments
+- Access AI symptom triage tools
+- View patient appointment history
+- Analyze patient symptoms
+
+### ADMIN
+- Full system access
+- User management (activate/deactivate/delete)
+- Doctor verification
+- View system statistics
+- Access AI triage audit logs
+
+## Database Schema
+
+The application uses Flyway migrations to manage the database schema. The following tables are created:
+
+### Core Tables
+
+**users** (V1__initial_migration.sql)
+- Core user information for all user types
+- Fields: id (UUID), email, password (encrypted), role, first_name, last_name, phone_number, is_active, created_at, updated_at
+- Unique constraint on email
+- Uses UUID extension for primary keys
+
+**patients** (V2__add_patients_and_doctors.sql)
+- Patient-specific data
+- Fields: id (UUID), user_id (FK to users), emergency_contact_name, emergency_contact_phone, blood_type, allergies (array), created_at
+- Blood type validation: A+, A-, B+, B-, AB+, AB-, O+, O-
+- CASCADE delete on user deletion
+
+**doctors** (V2__add_patients_and_doctors.sql)
+- Doctor-specific data
+- Fields: id (UUID), user_id (FK to users), medical_license_number (unique), specialization, years_of_experience, biography, consultation_fee, is_verified, created_at
+- CASCADE delete on user deletion
+
+**appointments** (V3__add_appointments.sql)
+- Appointment scheduling and management
+- Fields: id (UUID), patient_id (FK), doctor_id (FK), scheduled_date, scheduled_time, duration_minutes, status, created_at
+- Status values: SCHEDULED, CANCELLED, CONFIRMED, COMPLETED
+- CASCADE delete on patient/doctor deletion
+
+**ai_triage_audits** (V4__add_ai_triage_audits.sql)
+- AI analysis audit trail
+- Fields: id (UUID), patient_id (FK), user_input (symptoms), ai_output (analysis), urgency_level, created_at
+- Urgency levels: LOW, MEDIUM, HIGH, EMERGENCY
+- CASCADE delete on patient deletion
+
+### Database Relationships
+
+```
+users (1) ←→ (1) patients
+users (1) ←→ (1) doctors
+patients (1) ←→ (∞) appointments
+doctors (1) ←→ (∞) appointments
+patients (1) ←→ (∞) ai_triage_audits
+```
+
+### Migration Management
+
+To view the current migration status:
+
+```bash
+mvn flyway:info
+```
+
+To apply pending migrations:
 
 ```bash
 mvn flyway:migrate
 ```
 
-### Database Schema
+All migrations are idempotent and safe to run multiple times.
 
-The application creates the following tables:
-- `users` - Base user information
-- `doctors` - Doctor-specific information
-- `patients` - Patient-specific information
-
-## 🏃 Running the Application
-
-### Development Mode
-
-```bash
-mvn spring-boot:run
-```
-
-### Production Mode
-
-```bash
-java -jar target/telemedicine-0.0.1-SNAPSHOT.jar
-```
-
-The application will start on `http://localhost:8080`
-
-## 📚 API Documentation
-
-Once the application is running, access the Swagger UI documentation at:
-
-```
-http://localhost:8080/swagger-ui.html
-```
-
-Documentation's details will be added later.
-
-### API Endpoints
-
-#### Authentication
-
-**Register Doctor**
-```http
-POST /auth/doctor/register
-Content-Type: application/json
-
-{
-  "user": {
-    "email": "doctor@example.com",
-    "password": {
-      "password": "securePassword123",
-      "confirmPassword": "securePassword123"
-    },
-    "firstName": "John",
-    "lastName": "Doe",
-    "phoneNumber": "+905551234567",
-    "dateOfBirth": "1985-05-15"
-  },
-  "medicalLicenseNumber": "MD123456",
-  "specialization": "Cardiology",
-  "yearsOfExperience": 10,
-  "biography": "Experienced cardiologist...",
-  "consultationFee": 150.00
-}
-```
-
-**Register Patient**
-```http
-POST /auth/patient/register
-Content-Type: application/json
-
-{
-  "user": {
-    "email": "patient@example.com",
-    "password": {
-      "password": "securePassword123",
-      "confirmPassword": "securePassword123"
-    },
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "phoneNumber": "+905559876543",
-    "dateOfBirth": "1990-08-20"
-  },
-  "emergencyContactName": "John Smith",
-  "emergencyContactPhone": "+905551234567",
-  "bloodType": "A+",
-  "allergies": ["Penicillin", "Peanuts"]
-}
-```
-
-**Login**
-```http
-POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securePassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-### Authentication
-
-For protected endpoints, include the JWT token in the Authorization header:
-
-```http
-Authorization: Bearer <your-jwt-token>
-```
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 telemedicine/
@@ -245,7 +263,8 @@ telemedicine/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/dogukanpolat/telemedicine/
-│   │   │       ├── controller/         # REST controllers
+│   │   │       ├── config/            # Configuration(Swagger UI)
+│   │   │       ├── controller/        # REST controllers
 │   │   │       ├── dto/               # Data Transfer Objects
 │   │   │       ├── exception/         # Custom exceptions
 │   │   │       ├── mappers/           # MapStruct mappers
@@ -258,55 +277,156 @@ telemedicine/
 │   │       └── application.yml        # Application configuration
 │   └── test/                          # Test files
 ├── .env                               # Environment variables
+├── .env.example                       # Example for .env file
 ├── .gitignore
 ├── pom.xml                            # Maven configuration
 └── README.md
 ```
 
-## 🔒 Security
+## AI Triage System
 
-### Password Requirements
-- Minimum 8 characters
-- Maximum 20 characters
-- Must be confirmed during registration
+The AI triage system uses Google Gemini to analyze patient symptoms and provides:
+- **Urgency Level**: LOW, MEDIUM, HIGH, EMERGENCY
+- **Recommended Specialty**: Suggested medical specialty
+- **Key Questions**: Follow-up questions for doctors
+- **Triage Notes**: Analysis summary
+- **Audit Trail**: All analyses are logged for review
 
-### JWT Token
-- Expires after 24 hours (configurable)
-- Uses HS256 algorithm
-- Stateless authentication
+### Example Triage Request
 
-### Validation Rules
-
-**Email:** Must be valid email format
-
-**Phone Number:** Must match pattern `^\+?[1-9][0-9]\d{1,14}`
-
-**Blood Type:** Must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-
-
-**Medical License:** Maximum 100 characters, required for doctors
-
-**Consultation Fee:** Must be non-negative decimal
-
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👤 Author
-
-Doğukan Polat
-
-## ⚠️ Known Issues
-
-- None at the moment
-
-## 📊 Database ER Diagram
-
-```
-users (1) ←→ (1) doctors
-users (1) ←→ (1) patients
+```json
+{
+  "patientId": "uuid-here",
+  "symptomDescription": "Patient experiencing chest pain and shortness of breath"
+}
 ```
 
----
+### Example Response
 
-**Note:** This is a work in progress. Features and documentation will be updated regularly.
+```json
+{
+  "patientId": "uuid-here",
+  "urgency": "EMERGENCY",
+  "recommendedSpecialty": "Cardiology",
+  "keyQuestions": [
+    "When did symptoms start?",
+    "Any history of heart disease?"
+  ],
+  "triageNotes": "Severe symptoms requiring immediate attention",
+  "disclaimer": "AI analysis for triage assistance only. Not medical advice."
+}
+```
+
+## Email Notifications
+
+The system automatically sends email notifications for:
+- Appointment confirmations (to both patient and doctor)
+- Appointment cancellations
+- Status updates
+
+## Testing
+
+Run the test suite:
+
+```bash
+# Run all tests
+mvn test
+
+# Run with coverage
+mvn test jacoco:report
+```
+
+The project includes:
+- Unit tests for services
+- Integration tests for controllers
+- Repository tests
+- Security tests
+
+## Security
+
+- Passwords are encrypted using BCrypt
+- JWT tokens expire after 24 hours (configurable)
+- Role-based access control (RBAC)
+- CSRF protection disabled for REST API
+- Stateless session management
+
+## Error Handling
+
+The API uses standard HTTP status codes:
+- `200` - Success
+- `201` - Created
+- `204` - No Content
+- `400` - Bad Request (validation errors)
+- `401` - Unauthorized (authentication required)
+- `403` - Forbidden (insufficient permissions)
+- `500` - Internal Server Error
+
+All errors return a consistent JSON format:
+
+```json
+{
+  "status": "400",
+  "error": "Error Type",
+  "message": "Detailed error message",
+  "timestamp": "2025-10-22T10:30:00"
+}
+```
+
+## Configuration Properties
+
+Key application properties in `application.yml`:
+
+```yaml
+jwt:
+  secret: ${JWT_SECRET}      # JWT signing key
+  expiration: 86400          # Token expiration (seconds)
+
+gemini:
+  api-key: ${GEMINI_API_KEY} # Google Gemini API key
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+```
+
+## Development Tips
+
+1. **Database Migrations**: 
+   - Flyway automatically runs migrations on startup
+   - Never modify existing migration files
+   - Create new migration files with format: `V{version}__{description}.sql`
+   - Check migration status: `mvn flyway:info`
+   
+2. **API Testing**: Use Swagger UI for interactive API testing
+
+3. **Logging**: Check console logs for detailed application flow
+
+4. **Email Testing**: Use a test Gmail account for development
+
+5. **Maven Compilation**: The project uses annotation processors for Lombok and MapStruct
+   ```bash
+   # Clean build
+   mvn clean install
+   
+   # Skip tests during build
+   mvn clean install -DskipTests
+   ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+**Doğukan Polat**
+- GitHub: [@dogukanpolat](https://github.com/dogukanpolat)
+
+## Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check API documentation at `/swagger-ui.html`
+- Review test cases for usage examples
