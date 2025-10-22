@@ -119,8 +119,8 @@ class AppointmentControllerIntegrationTest {
         doctor.setId(doctorId);
 
         AppointmentRequestDto requestDto = new AppointmentRequestDto(
-                patient,
-                doctor,
+                patientId,
+                doctorId,
                 LocalDate.now().plusDays(1),
                 LocalTime.of(10, 0),
                 30

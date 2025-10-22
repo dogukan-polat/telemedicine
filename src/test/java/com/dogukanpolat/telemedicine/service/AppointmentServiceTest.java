@@ -8,6 +8,8 @@ import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.Patient;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
+import com.dogukanpolat.telemedicine.repository.DoctorRepository;
+import com.dogukanpolat.telemedicine.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +40,12 @@ class AppointmentServiceTest {
 
     @Mock
     private EmailNotificationService emailService;
+
+    @Mock
+    private PatientRepository patientRepository;
+
+    @Mock
+    private DoctorRepository doctorRepository;
 
     @InjectMocks
     private AppointmentService appointmentService;
@@ -70,8 +78,8 @@ class AppointmentServiceTest {
         testAppointment.setStatus(AppointmentStatus.SCHEDULED);
 
         requestDto = new AppointmentRequestDto(
-                patient,
-                doctor,
+                patientId,
+                doctorId,
                 LocalDate.now().plusDays(1),
                 LocalTime.of(10, 0),
                 30
@@ -112,6 +120,8 @@ class AppointmentServiceTest {
     void createAppointment_ShouldSaveAndSendEmail() {
         // Given
         when(appointmentMapper.toAppointment(requestDto)).thenReturn(testAppointment);
+        when(patientRepository.findById(patientId)).thenReturn(Optional.of(new Patient()));
+        when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(new Doctor()));
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(testAppointment);
         doNothing().when(emailService).sendAppointmentConfirmation(any(Appointment.class));
 

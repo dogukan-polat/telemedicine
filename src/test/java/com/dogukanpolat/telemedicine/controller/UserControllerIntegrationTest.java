@@ -19,10 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +62,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
 
         validDoctorRegistrationDto = new DoctorRegistrationDto(
@@ -152,8 +149,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         DoctorRegistrationDto invalidDoctorDto = new DoctorRegistrationDto(
                 invalidUserDto,
@@ -184,8 +180,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         DoctorRegistrationDto invalidDoctorDto = new DoctorRegistrationDto(
                 userDto,
@@ -216,8 +211,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         DoctorRegistrationDto invalidDoctorDto = new DoctorRegistrationDto(
                 userDto,
@@ -272,8 +266,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "Jane",
                 "Smith",
-                "+1234567890",
-                LocalDate.of(1995, 5, 15)
+                "+1234567890"
         );
         PatientRegistrationDto minimalPatientDto = new PatientRegistrationDto(
                 userDto,
@@ -328,8 +321,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         PatientRegistrationDto invalidPatientDto = new PatientRegistrationDto(
                 userDto,
@@ -358,8 +350,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "invalid-phone",  // Invalid phone
-                LocalDate.of(1990, 1, 1)
+                "invalid-phone"
         );
         PatientRegistrationDto invalidPatientDto = new PatientRegistrationDto(
                 userDto,
@@ -386,8 +377,7 @@ class UserControllerIntegrationTest {
                 mismatchedPasswordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         DoctorRegistrationDto doctorDto = new DoctorRegistrationDto(
                 userDto,
@@ -416,8 +406,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         DoctorRegistrationDto invalidDoctorDto = new DoctorRegistrationDto(
                 userDto,
@@ -445,8 +434,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
         PatientRegistrationDto patientDto = new PatientRegistrationDto(
                 userDto,
@@ -482,8 +470,7 @@ class UserControllerIntegrationTest {
                 passwordDto,
                 "Jane",
                 "Smith",
-                "+9876543210",
-                LocalDate.of(1995, 3, 15)
+                "+9876543210"
         );
         PatientRegistrationDto patientDto = new PatientRegistrationDto(
                 patientUserDto,

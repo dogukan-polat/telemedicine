@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,18 +51,16 @@ public class UserServiceTest {
 
     private UserRegistrationDto userRegistrationDto;
     private UserModel userModel;
-    private PasswordDto passwordDto;
 
     @BeforeEach
     void setUp() {
-        passwordDto = new PasswordDto("password123", "password123");
+        PasswordDto passwordDto = new PasswordDto("password123", "password123");
         userRegistrationDto = new UserRegistrationDto(
                 "test@example.com",
                 passwordDto,
                 "John",
                 "Doe",
-                "+1234567890",
-                LocalDate.of(1990, 1, 1)
+                "+1234567890"
         );
 
         userModel = new UserModel();
