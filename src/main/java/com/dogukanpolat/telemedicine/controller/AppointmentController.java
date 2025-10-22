@@ -5,6 +5,7 @@ import com.dogukanpolat.telemedicine.model.Appointment;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +31,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Get appointments by patient ID",
-            description = "Get appointments for a specific patient. Requires authentication."
+            description = "Get appointments for a specific patient. Requires authentication.",
+            parameters = @Parameter(name = "id", description = "Patient ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -53,7 +55,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Get appointments by doctor ID",
-            description = "Get appointments for a specific doctor. Requires authentication."
+            description = "Get appointments for a specific doctor. Requires authentication.",
+            parameters = @Parameter(name = "id", description = "Doctor ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -78,7 +81,12 @@ public class AppointmentController {
             summary = "Create an appointment",
             description = """
     Schedule a new appointment for patient and doctor. Only doctors can create appointments.
-    Email notifications are sent automatically."""
+    Email notifications are sent automatically.""",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Appointment details",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = AppointmentRequestDto.class))
+            )
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -105,7 +113,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Cancel an appointment",
-            description = "Change appointment status to CANCELLED."
+            description = "Change appointment status to CANCELLED.",
+            parameters = @Parameter(name = "id", description = "Appointment ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -125,7 +134,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Confirm an appointment",
-            description = "Change appointment status to CONFIRMED."
+            description = "Change appointment status to CONFIRMED.",
+            parameters = @Parameter(name = "id", description = "Appointment ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -145,7 +155,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Complete an appointment",
-            description = "Change appointment status to COMPLETED."
+            description = "Change appointment status to COMPLETED.",
+            parameters = @Parameter(name = "id", description = "Appointment ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -165,7 +176,8 @@ public class AppointmentController {
 
     @Operation(
             summary = "Delete an appointment",
-            description = "Delete an appointment by ID."
+            description = "Delete an appointment by ID.",
+            parameters = @Parameter(name = "id", description = "Appointment ID", required = true)
     )
     @ApiResponses(value = {
             @ApiResponse(
