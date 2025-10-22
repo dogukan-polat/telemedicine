@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/ai/triage/**").hasRole("DOCTOR")
 
                         .requestMatchers(HttpMethod.POST, "/appointments").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasRole("ADMIN")
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
