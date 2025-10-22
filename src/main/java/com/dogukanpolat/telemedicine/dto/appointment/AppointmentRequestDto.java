@@ -1,7 +1,5 @@
 package com.dogukanpolat.telemedicine.dto.appointment;
 
-import com.dogukanpolat.telemedicine.model.Doctor;
-import com.dogukanpolat.telemedicine.model.Patient;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
@@ -9,15 +7,16 @@ import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 
 public record AppointmentRequestDto(
 
-        @NotNull(message = "Patient cannot be null.")
-        Patient patient,
+        @NotNull(message = "Patient ID cannot be null.")
+        UUID patientId,
 
-        @NotNull(message = "Doctor cannot be null.")
-        Doctor doctor,
+        @NotNull(message = "Doctor ID cannot be null.")
+        UUID doctorId,
 
         @NotNull(message = "Date can't be null.")
         @FutureOrPresent(message = "Cannot be scheduled in past.")
