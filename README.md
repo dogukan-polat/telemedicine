@@ -129,50 +129,50 @@ Once the application is running, visit:
 
 ### Authentication Endpoints
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/login` | User login | No |
-| POST | `/users/register/doctor` | Register as doctor | No |
-| POST | `/users/register/patient` | Register as patient | No |
-| POST | `/users/register/admin` | Register as admin | No* |
+| Method | Endpoint                  | Description         | Auth Required |
+|--------|---------------------------|---------------------|---------------|
+| POST   | `/auth/login`             | User login          | No            |
+| POST   | `/users/register/doctor`  | Register as doctor  | No            |
+| POST   | `/users/register/patient` | Register as patient | No            |
+| POST   | `/users/register/admin`   | Register as admin   | No*           |
 
 *Admin registration requires email to match configured admin email
 
 ### Appointment Endpoints
 
-| Method | Endpoint | Description | Role |
-|--------|----------|-------------|------|
-| GET | `/appointments/patient/{id}` | Get patient appointments | Authenticated |
-| GET | `/appointments/doctor/{id}` | Get doctor appointments | Authenticated |
-| POST | `/appointments` | Create appointment | DOCTOR |
-| PATCH | `/appointments/{id}/cancel` | Cancel appointment | Authenticated |
-| PATCH | `/appointments/{id}/confirm` | Confirm appointment | Authenticated |
-| PATCH | `/appointments/{id}/complete` | Complete appointment | Authenticated |
-| DELETE | `/appointments/{id}` | Delete appointment | ADMIN |
+| Method | Endpoint                      | Description              | Role          |
+|--------|-------------------------------|--------------------------|---------------|
+| GET    | `/appointments/patient/{id}`  | Get patient appointments | Authenticated |
+| GET    | `/appointments/doctor/{id}`   | Get doctor appointments  | Authenticated |
+| POST   | `/appointments`               | Create appointment       | DOCTOR        |
+| PATCH  | `/appointments/{id}/cancel`   | Cancel appointment       | Authenticated |
+| PATCH  | `/appointments/{id}/confirm`  | Confirm appointment      | Authenticated |
+| PATCH  | `/appointments/{id}/complete` | Complete appointment     | Authenticated |
+| DELETE | `/appointments/{id}`          | Delete appointment       | ADMIN         |
 
 ### AI Triage Endpoints
 
-| Method | Endpoint | Description | Role |
-|--------|----------|-------------|------|
-| POST | `/ai/triage/analyze` | Analyze patient symptoms | DOCTOR |
-| POST | `/ai/triage/quick-analyze` | Quick analysis (no patient ID) | DOCTOR |
+| Method | Endpoint                   | Description                    | Role   |
+|--------|----------------------------|--------------------------------|--------|
+| POST   | `/ai/triage/analyze`       | Analyze patient symptoms       | DOCTOR |
+| POST   | `/ai/triage/quick-analyze` | Quick analysis (no patient ID) | DOCTOR |
 
 ### Admin Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/admin/users` | Get all users |
-| GET | `/admin/patients` | Get all patients |
-| GET | `/admin/doctors` | Get all doctors |
-| GET | `/admin/stats` | Get system statistics |
-| GET | `/admin/triages` | Get AI triage audits |
-| GET | `/admin/triage-audits/patient/{id}` | Get patient triage audits |
-| GET | `/admin/triage-audits/urgency/{level}` | Get audits by urgency |
-| PATCH | `/admin/users/{email}/activate` | Activate user |
-| PATCH | `/admin/users/{email}/deactivate` | Deactivate user |
-| PATCH | `/admin/doctors/{license}/verify` | Verify doctor |
-| PATCH | `/admin/doctors/{license}/unverify` | Unverify doctor |
-| DELETE | `/admin/users/{email}` | Delete user |
+| Method | Endpoint                               | Description               |
+|--------|----------------------------------------|---------------------------|
+| GET    | `/admin/users`                         | Get all users             |
+| GET    | `/admin/patients`                      | Get all patients          |
+| GET    | `/admin/doctors`                       | Get all doctors           |
+| GET    | `/admin/stats`                         | Get system statistics     |
+| GET    | `/admin/triages`                       | Get AI triage audits      |
+| GET    | `/admin/triage-audits/patient/{id}`    | Get patient triage audits |
+| GET    | `/admin/triage-audits/urgency/{level}` | Get audits by urgency     |
+| PATCH  | `/admin/users/{email}/activate`        | Activate user             |
+| PATCH  | `/admin/users/{email}/deactivate`      | Deactivate user           |
+| PATCH  | `/admin/doctors/{license}/verify`      | Verify doctor             |
+| PATCH  | `/admin/doctors/{license}/unverify`    | Unverify doctor           |
+| DELETE | `/admin/users/{email}`                 | Delete user               |
 
 ## User Roles
 
@@ -423,10 +423,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Doğukan Polat**
 - GitHub: [@dogukanpolat](https://github.com/dogukanpolat)
-
-## Support
-
-For issues and questions:
-- Create an issue on GitHub
-- Check API documentation at `/swagger-ui.html`
-- Review test cases for usage examples
