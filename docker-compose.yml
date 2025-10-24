@@ -1,0 +1,43 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: telemedicine-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: telemedicine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telemedicine-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/telemedicine
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: 86400
+
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    networks:
+      - telemedicine-network
+
+volumes:
+  postgres-data:
+    driver: local
