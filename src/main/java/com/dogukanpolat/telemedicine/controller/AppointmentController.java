@@ -1,7 +1,7 @@
 package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
-import com.dogukanpolat.telemedicine.model.Appointment;
+import com.dogukanpolat.telemedicine.dto.appointment.AppointmentResponseDto;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class AppointmentController {
                     description = "List of appointments for the patient retrieved successfully.",
                     content = @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = Appointment.class))
+                            array = @ArraySchema(schema = @Schema(implementation = AppointmentResponseDto.class))
                     )
             ),
             @ApiResponse(
@@ -49,7 +49,7 @@ public class AppointmentController {
             )
     })
     @GetMapping("/patient/{id}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByPatientId(@PathVariable UUID id) {
+    public ResponseEntity<List<AppointmentResponseDto>> getAppointmentsByPatientId(@PathVariable UUID id) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByPatientId(id));
     }
 
@@ -64,7 +64,7 @@ public class AppointmentController {
                     description = "List of appointments for the doctor retrieved successfully.",
                     content = @Content(
                             mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = Appointment.class))
+                            array = @ArraySchema(schema = @Schema(implementation = AppointmentResponseDto.class))
                     )
             ),
             @ApiResponse(
@@ -73,7 +73,7 @@ public class AppointmentController {
             )
     })
     @GetMapping("/doctor/{id}")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDoctorId(@PathVariable UUID id) {
+    public ResponseEntity<List<AppointmentResponseDto>> getAppointmentsByDoctorId(@PathVariable UUID id) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByDoctorId(id));
     }
 
@@ -94,7 +94,7 @@ public class AppointmentController {
                     description = "Appointment created successfully.",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = Appointment.class)
+                            schema = @Schema(implementation = AppointmentResponseDto.class)
                     )
             ),
             @ApiResponse(
@@ -107,7 +107,7 @@ public class AppointmentController {
             )
     })
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody @Valid AppointmentRequestDto appointmentRequest) {
+    public ResponseEntity<AppointmentResponseDto> createAppointment(@RequestBody @Valid AppointmentRequestDto appointmentRequest) {
         return ResponseEntity.ok(appointmentService.createAppointment(appointmentRequest));
     }
 
@@ -120,7 +120,7 @@ public class AppointmentController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Appointment cancelled successfully",
-                    content = @Content(schema = @Schema(implementation = Appointment.class))
+                    content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class))
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -128,7 +128,7 @@ public class AppointmentController {
             )
     })
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Appointment> cancelAppointment(@PathVariable UUID id) {
+    public ResponseEntity<AppointmentResponseDto> cancelAppointment(@PathVariable UUID id) {
         return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.CANCELLED));
     }
 
@@ -141,7 +141,7 @@ public class AppointmentController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Appointment confirmed successfully",
-                    content = @Content(schema = @Schema(implementation = Appointment.class))
+                    content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class))
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -149,7 +149,7 @@ public class AppointmentController {
             )
     })
     @PatchMapping("/{id}/confirm")
-    public ResponseEntity<Appointment> confirmAppointment(@PathVariable UUID id) {
+    public ResponseEntity<AppointmentResponseDto> confirmAppointment(@PathVariable UUID id) {
         return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.CONFIRMED));
     }
 
@@ -162,7 +162,7 @@ public class AppointmentController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Appointment completed successfully",
-                    content = @Content(schema = @Schema(implementation = Appointment.class))
+                    content = @Content(schema = @Schema(implementation = AppointmentResponseDto.class))
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -170,7 +170,7 @@ public class AppointmentController {
             )
     })
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<Appointment> completeAppointment(@PathVariable UUID id) {
+    public ResponseEntity<AppointmentResponseDto> completeAppointment(@PathVariable UUID id) {
         return ResponseEntity.ok(appointmentService.changeAppointmentStatus(id, AppointmentStatus.COMPLETED));
     }
 

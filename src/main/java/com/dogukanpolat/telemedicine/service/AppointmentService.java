@@ -1,6 +1,7 @@
 package com.dogukanpolat.telemedicine.service;
 
 import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
+import com.dogukanpolat.telemedicine.dto.appointment.AppointmentResponseDto;
 import com.dogukanpolat.telemedicine.mappers.AppointmentMapper;
 import com.dogukanpolat.telemedicine.model.Appointment;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
@@ -23,15 +24,15 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
-    public List<Appointment> getAppointmentsByPatientId(UUID id) {
-        return appointmentRepository.findByPatientId(id);
+    public List<AppointmentResponseDto> getAppointmentsByPatientId(UUID id) {
+        return appointmentRepository.findByPatientId(id).stream().map(appointmentMapper::toAppointmentResponseDto).toList();
     }
 
-    public List<Appointment> getAppointmentsByDoctorId(UUID id) {
-        return appointmentRepository.findByDoctorId(id);
+    public List<AppointmentResponseDto> getAppointmentsByDoctorId(UUID id) {
+        return appointmentRepository.findByDoctorId(id).stream().map(appointmentMapper::toAppointmentResponseDto).toList();
     }
 
-    public Appointment createAppointment(AppointmentRequestDto appointmentRequest) {
+    public AppointmentResponseDto createAppointment(AppointmentRequestDto appointmentRequest) {
         Appointment appointment = appointmentMapper.toAppointment(appointmentRequest);
         appointment.setId(UUID.randomUUID());
         appointment.setPatient(patientRepository.findById(appointmentRequest.patientId()).orElseThrow());
@@ -39,16 +40,17 @@ public class AppointmentService {
         appointment.setCreatedAt(Instant.now());
         Appointment saved = appointmentRepository.save(appointment);
         emailService.sendAppointmentConfirmation(saved);
-        return saved;
+        return appointmentMapper.toAppointmentResponseDto(saved);
     }
 
     public void deleteAppointment(UUID id) {
         appointmentRepository.deleteById(id);
     }
 
-    public Appointment changeAppointmentStatus(UUID id, AppointmentStatus status) {
+    public AppointmentResponseDto changeAppointmentStatus(UUID id, AppointmentStatus status) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Appointment cannot be null"));
         appointment.setStatus(status);
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        return appointmentMapper.toAppointmentResponseDto(saved);
     }
 }
