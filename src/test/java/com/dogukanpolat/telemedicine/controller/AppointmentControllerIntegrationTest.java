@@ -1,7 +1,7 @@
 package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.dto.appointment.AppointmentRequestDto;
-import com.dogukanpolat.telemedicine.model.Appointment;
+import com.dogukanpolat.telemedicine.dto.appointment.AppointmentResponseDto;
 import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.Patient;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
@@ -50,17 +50,13 @@ class AppointmentControllerIntegrationTest {
 
     private UUID patientId;
     private UUID doctorId;
-    private UUID appointmentId;
-    private Appointment testAppointment;
+    private AppointmentResponseDto testAppointmentResponse;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
 
         patientId = UUID.randomUUID();
         doctorId = UUID.randomUUID();
-        appointmentId = UUID.randomUUID();
 
         Patient patient = new Patient();
         patient.setId(patientId);
@@ -68,28 +64,33 @@ class AppointmentControllerIntegrationTest {
         Doctor doctor = new Doctor();
         doctor.setId(doctorId);
 
-        testAppointment = new Appointment();
-        testAppointment.setId(appointmentId);
-        testAppointment.setPatient(patient);
-        testAppointment.setDoctor(doctor);
-        testAppointment.setScheduledDate(LocalDate.now().plusDays(1));
-        testAppointment.setScheduledTime(LocalTime.of(10, 0));
-        testAppointment.setDurationMinutes(30);
-        testAppointment.setStatus(AppointmentStatus.SCHEDULED);
+        testAppointmentResponse = new AppointmentResponseDto(
+                "John",
+                "Doe",
+                "Jane",
+                "Smith",
+                LocalDate.now().plusDays(1),
+                LocalTime.of(10,10),
+                30,
+                AppointmentStatus.SCHEDULED
+                );
     }
 
     @Test
     void getAppointmentsByPatientId_ShouldReturn200() throws Exception {
         // Given
         when(appointmentService.getAppointmentsByPatientId(patientId))
-                .thenReturn(List.of(testAppointment));
+                .thenReturn(List.of(testAppointmentResponse));
 
         // When & Then
         mockMvc.perform(get("/appointments/patient/{id}", patientId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(appointmentId.toString()))
-                .andExpect(jsonPath("$[0].durationMinutes").value(30));
+                .andExpect(jsonPath("$[0].patientFirstName").value("John"))
+                .andExpect(jsonPath("$[0].patientLastName").value("Doe"))
+                .andExpect(jsonPath("$[0].doctorFirstName").value("Jane"))
+                .andExpect(jsonPath("$[0].doctorLastName").value("Smith"))
+                .andExpect(jsonPath("$[0].durationInMinutes").value(30));
 
         verify(appointmentService).getAppointmentsByPatientId(patientId);
     }
@@ -98,13 +99,16 @@ class AppointmentControllerIntegrationTest {
     void getAppointmentsByDoctorId_ShouldReturn200() throws Exception {
         // Given
         when(appointmentService.getAppointmentsByDoctorId(doctorId))
-                .thenReturn(List.of(testAppointment));
+                .thenReturn(List.of(testAppointmentResponse));
 
         // When & Then
         mockMvc.perform(get("/appointments/doctor/{id}", doctorId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(appointmentId.toString()));
+                .andExpect(jsonPath("$[0].patientFirstName").value("John"))
+                .andExpect(jsonPath("$[0].patientLastName").value("Doe"))
+                .andExpect(jsonPath("$[0].doctorFirstName").value("Jane"))
+                .andExpect(jsonPath("$[0].doctorLastName").value("Smith"));
 
         verify(appointmentService).getAppointmentsByDoctorId(doctorId);
     }
@@ -112,30 +116,27 @@ class AppointmentControllerIntegrationTest {
     @Test
     void createAppointment_ShouldReturn200() throws Exception {
         // Given
-        Patient patient = new Patient();
-        patient.setId(patientId);
-
-        Doctor doctor = new Doctor();
-        doctor.setId(doctorId);
-
         AppointmentRequestDto requestDto = new AppointmentRequestDto(
                 patientId,
                 doctorId,
                 LocalDate.now().plusDays(1),
-                LocalTime.of(10, 0),
+                LocalTime.of(10,10),
                 30
         );
 
         when(appointmentService.createAppointment(any(AppointmentRequestDto.class)))
-                .thenReturn(testAppointment);
+                .thenReturn(testAppointmentResponse);
 
         // When & Then
         mockMvc.perform(post("/appointments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(appointmentId.toString()))
-                .andExpect(jsonPath("$.durationMinutes").value(30));
+                .andExpect(jsonPath("$.patientFirstName").value("John"))
+                .andExpect(jsonPath("$.patientLastName").value("Doe"))
+                .andExpect(jsonPath("$.doctorFirstName").value("Jane"))
+                .andExpect(jsonPath("$.doctorLastName").value("Smith"))
+                .andExpect(jsonPath("$.durationInMinutes").value(30));
 
         verify(appointmentService).createAppointment(any(AppointmentRequestDto.class));
     }
@@ -143,14 +144,15 @@ class AppointmentControllerIntegrationTest {
     @Test
     void cancelAppointment_ShouldReturn200() throws Exception {
         // Given
-        testAppointment.setStatus(AppointmentStatus.CANCELLED);
+        UUID appointmentId = UUID.randomUUID();
         when(appointmentService.changeAppointmentStatus(appointmentId, AppointmentStatus.CANCELLED))
-                .thenReturn(testAppointment);
+                .thenReturn(testAppointmentResponse);
 
         // When & Then
         mockMvc.perform(patch("/appointments/{id}/cancel", appointmentId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CANCELLED"));
+                .andExpect(jsonPath("$.patientFirstName").value("John"))
+                .andExpect(jsonPath("$.patientLastName").value("Doe"));
 
         verify(appointmentService).changeAppointmentStatus(appointmentId, AppointmentStatus.CANCELLED);
     }
@@ -158,14 +160,15 @@ class AppointmentControllerIntegrationTest {
     @Test
     void confirmAppointment_ShouldReturn200() throws Exception {
         // Given
-        testAppointment.setStatus(AppointmentStatus.CONFIRMED);
+        UUID appointmentId = UUID.randomUUID();
         when(appointmentService.changeAppointmentStatus(appointmentId, AppointmentStatus.CONFIRMED))
-                .thenReturn(testAppointment);
+                .thenReturn(testAppointmentResponse);
 
         // When & Then
         mockMvc.perform(patch("/appointments/{id}/confirm", appointmentId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CONFIRMED"));
+                .andExpect(jsonPath("$.patientFirstName").value("John"))
+                .andExpect(jsonPath("$.patientLastName").value("Doe"));
 
         verify(appointmentService).changeAppointmentStatus(appointmentId, AppointmentStatus.CONFIRMED);
     }
@@ -173,14 +176,15 @@ class AppointmentControllerIntegrationTest {
     @Test
     void completeAppointment_ShouldReturn200() throws Exception {
         // Given
-        testAppointment.setStatus(AppointmentStatus.COMPLETED);
+        UUID appointmentId = UUID.randomUUID();
         when(appointmentService.changeAppointmentStatus(appointmentId, AppointmentStatus.COMPLETED))
-                .thenReturn(testAppointment);
+                .thenReturn(testAppointmentResponse);
 
         // When & Then
         mockMvc.perform(patch("/appointments/{id}/complete", appointmentId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("COMPLETED"));
+                .andExpect(jsonPath("$.patientFirstName").value("John"))
+                .andExpect(jsonPath("$.patientLastName").value("Doe"));
 
         verify(appointmentService).changeAppointmentStatus(appointmentId, AppointmentStatus.COMPLETED);
     }
@@ -188,6 +192,7 @@ class AppointmentControllerIntegrationTest {
     @Test
     void deleteAppointment_ShouldReturn204() throws Exception {
         // Given
+        UUID appointmentId = UUID.randomUUID();
         doNothing().when(appointmentService).deleteAppointment(appointmentId);
 
         // When & Then
