@@ -51,4 +51,6 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
     );
 
     void deleteByDoctorId(UUID doctorId);
+
+    List<DoctorAvailability> findByDoctorIdAndIsAvailable(UUID doctorId, Boolean isAvailable);
 }
