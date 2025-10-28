@@ -62,6 +62,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(AvailabilityException.class)
+    public ResponseEntity<Map<String, String>> handleAvailabilityException(AvailabilityException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("status", "400");
+        error.put("error", "Availability Exception");
+        error.put("message", ex.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.badRequest().body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
         Map<String, String> error = new HashMap<>();

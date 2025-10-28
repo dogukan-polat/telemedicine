@@ -4,6 +4,7 @@ import com.dogukanpolat.telemedicine.dto.availability.AvailabilityRequestDto;
 import com.dogukanpolat.telemedicine.dto.availability.AvailabilityResponseDto;
 import com.dogukanpolat.telemedicine.dto.availability.AvailabilityUpdateDto;
 import com.dogukanpolat.telemedicine.dto.availability.BulkAvailabilityRequestDto;
+import com.dogukanpolat.telemedicine.exception.AvailabilityException;
 import com.dogukanpolat.telemedicine.mappers.AvailabilityMapper;
 import com.dogukanpolat.telemedicine.model.Doctor;
 import com.dogukanpolat.telemedicine.model.DoctorAvailability;
@@ -48,7 +49,7 @@ public class DoctorAvailabilityService {
         );
 
         if (!overlapping.isEmpty()) {
-            throw new RuntimeException("Availability slot overlaps with existing slot");
+            throw new AvailabilityException("Availability slot overlaps with existing slot");
         }
 
         DoctorAvailability availability = availabilityMapper.toEntity(request);
@@ -81,7 +82,7 @@ public class DoctorAvailabilityService {
             );
 
             if (!overlapping.isEmpty()) {
-                throw new RuntimeException("Availability slot for " + slot.dayOfWeek() +
+                throw new AvailabilityException("Availability slot for " + slot.dayOfWeek() +
                         " " + slot.startTime() + "-" + slot.endTime() + " overlaps with existing slot");
             }
 
@@ -156,7 +157,7 @@ public class DoctorAvailabilityService {
             overlapping.removeIf(a -> a.getId().equals(availabilityId));
 
             if (!overlapping.isEmpty()) {
-                throw new RuntimeException("Updated time slot overlaps with existing availability");
+                throw new AvailabilityException("Updated time slot overlaps with existing availability");
             }
 
             availability.setStartTime(updateDto.startTime());
@@ -198,7 +199,7 @@ public class DoctorAvailabilityService {
 
     private void validateTimeRange(LocalTime startTime, LocalTime endTime) {
         if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
-            throw new RuntimeException("Start time must be before end time");
+            throw new AvailabilityException("Start time must be before end time");
         }
     }
 
