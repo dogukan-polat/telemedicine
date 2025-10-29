@@ -229,4 +229,26 @@ public class DoctorAvailabilityController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Delete all doctor availability",
+            description = "Delete all availability slots for a doctor. Only doctors can delete their own availability."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "All availability slots deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - Only doctors can delete their own availability"
+            )
+    })
+    @DeleteMapping("/doctor/{doctorId}")
+    public ResponseEntity<Void> deleteAllDoctorAvailability(
+            @Parameter(description = "Doctor ID", required = true)
+            @PathVariable UUID doctorId) {
+        doctorAvailabilityService.deleteAllDoctorAvailability(doctorId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

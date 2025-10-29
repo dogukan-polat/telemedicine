@@ -11,6 +11,7 @@ import com.dogukanpolat.telemedicine.model.DoctorAvailability;
 import com.dogukanpolat.telemedicine.model.enums.DayOfWeek;
 import com.dogukanpolat.telemedicine.repository.DoctorAvailabilityRepository;
 import com.dogukanpolat.telemedicine.repository.DoctorRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class DoctorAvailabilityService {
     private final AvailabilityMapper availabilityMapper;
 
     @Transactional
-    public AvailabilityResponseDto createAvailability(AvailabilityRequestDto request) {
+    public AvailabilityResponseDto createAvailability(@Valid AvailabilityRequestDto request) {
         log.info("Creating availability for doctor: {}", request.doctorId());
 
         // Validate doctor exists
@@ -62,7 +63,7 @@ public class DoctorAvailabilityService {
     }
 
     @Transactional
-    public List<AvailabilityResponseDto> createBulkAvailability(BulkAvailabilityRequestDto request) {
+    public List<AvailabilityResponseDto> createBulkAvailability(@Valid BulkAvailabilityRequestDto request) {
         log.info("Creating bulk availability for doctor: {}", request.doctorId());
 
         Doctor doctor = doctorRepository.findById(request.doctorId())
@@ -137,7 +138,7 @@ public class DoctorAvailabilityService {
     }
 
     @Transactional
-    public AvailabilityResponseDto updateAvailability(UUID availabilityId, AvailabilityUpdateDto updateDto) {
+    public AvailabilityResponseDto updateAvailability(UUID availabilityId, @Valid AvailabilityUpdateDto updateDto) {
         log.info("Updating availability: {}", availabilityId);
 
         DoctorAvailability availability = availabilityRepository.findById(availabilityId)
