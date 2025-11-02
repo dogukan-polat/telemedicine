@@ -7,7 +7,6 @@ import java.time.LocalTime;
 
 public record DoctorSearchCriteria(
         String specialization,
-        String location,
         BigDecimal minFee,
         BigDecimal maxFee,
         Integer minExperience,
