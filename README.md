@@ -324,6 +324,166 @@ The system automatically sends email notifications for:
 - Appointment cancellations
 - Status updates
 
+## Doctor Availability Management
+
+The system includes comprehensive availability management that allows doctors to define their working hours and ensures appointments can only be booked during available time slots.
+
+### Availability Endpoints
+
+| Method | Endpoint                                  | Description                        | Role   |
+|--------|-------------------------------------------|------------------------------------|--------|
+| POST   | `/availability`                           | Create availability slot           | DOCTOR |
+| POST   | `/availability/bulk`                      | Create multiple availability slots | DOCTOR |
+| GET    | `/availability/doctor/{id}`               | Get doctor's availability          | Auth   |
+| GET    | `/availability/doctor/{id}/day/{day}`     | Get availability by day            | Auth   |
+| GET    | `/availability/doctor/{id}/active`        | Get active availability only       | Auth   |
+| PATCH  | `/availability/{id}`                      | Update availability slot           | DOCTOR |
+| DELETE | `/availability/{id}`                      | Delete availability slot           | DOCTOR |
+| DELETE | `/availability/doctor/{id}`               | Delete all doctor's availability   | DOCTOR |
+
+### Features
+
+- **Time Slot Management**: Doctors can define their available hours for each day of the week
+- **Overlap Prevention**: System prevents creating overlapping availability slots
+- **Appointment Validation**: Appointments can only be created during doctor's available hours
+- **Flexible Scheduling**: Support for different schedules on different days
+- **Bulk Operations**: Create multiple availability slots at once
+- **Enable/Disable Slots**: Temporarily disable availability without deletion
+
+### Example: Creating Availability
+
+**Single Slot:**
+
+POST /availability
+```json
+{
+  "doctorId": "uuid-here",
+  "dayOfWeek": "MONDAY",
+  "startTime": "09:00:00",
+  "endTime": "17:00:00"
+}
+```
+
+**Bulk Creation:**
+
+POST /availability/bulk
+
+```json
+
+{
+  "doctorId": "uuid-here",
+  "slots": [
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "09:00:00",
+      "endTime": "12:00:00"
+    },
+    {
+      "dayOfWeek": "MONDAY",
+      "startTime": "13:00:00",
+      "endTime": "17:00:00"
+    },
+    {
+      "dayOfWeek": "TUESDAY",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00"
+    }
+  ]
+}
+```
+
+### Example: Updating Availability  
+
+PATCH /availability/{availability-id}
+
+```json
+{
+  "startTime": "10:00:00",
+  "endTime": "18:00:00",
+  "isAvailable": true
+}
+```
+
+### Appointment Booking with Availability
+
+When creating an appointment, the system automatically:
+1. Checks if the doctor has availability defined for that day
+2. Validates that the appointment time falls within an available slot
+3. Rejects the appointment if the doctor is not available
+4. Returns a clear error message if validation fails
+
+**Error Response:**
+```json
+{
+  "status": "400",
+  "error": "Availability Error",
+  "message": "Doctor is not available at the requested time. Please check doctor's availability schedule.",
+  "timestamp": "2025-10-26T10:30:00"
+}
+```
+
+### Days of Week
+
+Valid values for `dayOfWeek`:
+- MONDAY
+- TUESDAY
+- WEDNESDAY
+- THURSDAY
+- FRIDAY
+- SATURDAY
+- SUNDAY
+
+### Time Format
+
+Times should be in ISO-8601 format: `HH:mm:ss` (e.g., "09:00:00", "17:30:00")
+
+### Validation Rules
+
+1. **Time Range**: Start time must be before end time
+2. **No Overlaps**: Cannot create overlapping availability slots for the same day
+3. **Doctor Exists**: Doctor ID must reference an existing doctor
+4. **Active Slots**: Only active slots (isAvailable=true) are considered for appointment validation
+
+### Use Cases
+
+**Morning/Afternoon Split:**
+```json
+[
+  {
+    "dayOfWeek": "MONDAY",
+    "startTime": "08:00:00",
+    "endTime": "12:00:00"
+  },
+  {
+    "dayOfWeek": "MONDAY",
+    "startTime": "14:00:00",
+    "endTime": "18:00:00"
+  }
+]
+```
+
+**Weekend Coverage:**
+```json
+[
+  {
+    "dayOfWeek": "SATURDAY",
+    "startTime": "09:00:00",
+    "endTime": "13:00:00"
+  }
+]
+```
+
+**Emergency Coverage (24/7):**
+```json
+[
+  {
+    "dayOfWeek": "MONDAY",
+    "startTime": "00:00:00",
+    "endTime": "23:59:59"
+  }
+]
+```
+
 ## Testing
 
 Run the test suite:
@@ -422,4 +582,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 **Doğukan Polat**
-- GitHub: [@dogukanpolat](https://github.com/dogukanpolat)
+- GitHub: [@dogukan-polat](https://github.com/dogukan-polat)
