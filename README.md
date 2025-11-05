@@ -229,6 +229,14 @@ The application uses Flyway migrations to manage the database schema. The follow
 - Urgency levels: LOW, MEDIUM, HIGH, EMERGENCY
 - CASCADE delete on patient deletion
 
+**doctors_availability** (V5__add_doctor_availability.sql)
+- Doctor availability management
+- Fields: id (UUID), doctor_id (FK), day_of_week, start_time, end_time, is_available, created_at
+- Day of week values: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+- Time format: HH:mm:ss
+- Unique constraint on doctor_id & day_of_week
+- CASCADE delete on doctor deletion
+
 ### Database Relationships
 
 ```
@@ -237,6 +245,7 @@ users (1) ←→ (1) doctors
 patients (1) ←→ (∞) appointments
 doctors (1) ←→ (∞) appointments
 patients (1) ←→ (∞) ai_triage_audits
+doctors (1) ←→ (1) doctors_availability
 ```
 
 ### Migration Management
@@ -278,6 +287,8 @@ telemedicine/
 │   └── test/                          # Test files
 ├── .env                               # Environment variables
 ├── .env.example                       # Example for .env file
+├── Dockerfile                         # Dockerfile for deployment
+├── docker-compose.yml                 # Docker Compose file for local development
 ├── .gitignore
 ├── pom.xml                            # Maven configuration
 └── README.md
