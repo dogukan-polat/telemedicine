@@ -10,6 +10,7 @@ A comprehensive telemedicine platform API built with Spring Boot that enables se
 - 🤖 **AI-Powered Triage** - Intelligent symptom analysis using Google Gemini AI
 - 📧 **Email Notifications** - Automated email notifications for appointments
 - 📊 **Admin Dashboard** - System statistics and audit trail management
+- 🔍 **Search Doctors, Patients & Appointments** - Search doctors, patients and appointments by properties
 - 📝 **API Documentation** - Interactive Swagger/OpenAPI documentation
 
 ## Tech Stack
@@ -173,6 +174,28 @@ Once the application is running, visit:
 | PATCH  | `/admin/doctors/{license}/verify`      | Verify doctor             |
 | PATCH  | `/admin/doctors/{license}/unverify`    | Unverify doctor           |
 | DELETE | `/admin/users/{email}`                 | Delete user               |
+
+### Availability Endpoints
+
+| Method | Endpoint                                  | Description                        | Role   |
+|--------|-------------------------------------------|------------------------------------|--------|
+| POST   | `/availability`                           | Create availability slot           | DOCTOR |
+| POST   | `/availability/bulk`                      | Create multiple availability slots | DOCTOR |
+| GET    | `/availability/doctor/{id}`               | Get doctor's availability          | Auth   |
+| GET    | `/availability/doctor/{id}/day/{day}`     | Get availability by day            | Auth   |
+| GET    | `/availability/doctor/{id}/active`        | Get active availability only       | Auth   |
+| PATCH  | `/availability/{id}`                      | Update availability slot           | DOCTOR |
+| DELETE | `/availability/{id}`                      | Delete availability slot           | DOCTOR |
+| DELETE | `/availability/doctor/{id}`               | Delete all doctor's availability   | DOCTOR |
+
+
+### Search Endpoints
+
+| Method | Endpoint               | Description                                    | Role          |
+|--------|------------------------|------------------------------------------------|---------------|
+| GET    | `/search/doctors`      | Search doctors by name, specialization...      | Authenticated |
+| GET    | `/search/patients`     | Search patients by name, blood type...         | ADMIN         |
+| GET    | `/search/appointments` | Search appointments by doctor & patient IDs... | Authenticated |
 
 ## User Roles
 
@@ -339,18 +362,6 @@ The system automatically sends email notifications for:
 
 The system includes comprehensive availability management that allows doctors to define their working hours and ensures appointments can only be booked during available time slots.
 
-### Availability Endpoints
-
-| Method | Endpoint                                  | Description                        | Role   |
-|--------|-------------------------------------------|------------------------------------|--------|
-| POST   | `/availability`                           | Create availability slot           | DOCTOR |
-| POST   | `/availability/bulk`                      | Create multiple availability slots | DOCTOR |
-| GET    | `/availability/doctor/{id}`               | Get doctor's availability          | Auth   |
-| GET    | `/availability/doctor/{id}/day/{day}`     | Get availability by day            | Auth   |
-| GET    | `/availability/doctor/{id}/active`        | Get active availability only       | Auth   |
-| PATCH  | `/availability/{id}`                      | Update availability slot           | DOCTOR |
-| DELETE | `/availability/{id}`                      | Delete availability slot           | DOCTOR |
-| DELETE | `/availability/doctor/{id}`               | Delete all doctor's availability   | DOCTOR |
 
 ### Features
 
@@ -361,59 +372,6 @@ The system includes comprehensive availability management that allows doctors to
 - **Bulk Operations**: Create multiple availability slots at once
 - **Enable/Disable Slots**: Temporarily disable availability without deletion
 
-### Example: Creating Availability
-
-**Single Slot:**
-
-POST /availability
-```json
-{
-  "doctorId": "uuid-here",
-  "dayOfWeek": "MONDAY",
-  "startTime": "09:00:00",
-  "endTime": "17:00:00"
-}
-```
-
-**Bulk Creation:**
-
-POST /availability/bulk
-
-```json
-
-{
-  "doctorId": "uuid-here",
-  "slots": [
-    {
-      "dayOfWeek": "MONDAY",
-      "startTime": "09:00:00",
-      "endTime": "12:00:00"
-    },
-    {
-      "dayOfWeek": "MONDAY",
-      "startTime": "13:00:00",
-      "endTime": "17:00:00"
-    },
-    {
-      "dayOfWeek": "TUESDAY",
-      "startTime": "09:00:00",
-      "endTime": "17:00:00"
-    }
-  ]
-}
-```
-
-### Example: Updating Availability  
-
-PATCH /availability/{availability-id}
-
-```json
-{
-  "startTime": "10:00:00",
-  "endTime": "18:00:00",
-  "isAvailable": true
-}
-```
 
 ### Appointment Booking with Availability
 
@@ -423,15 +381,6 @@ When creating an appointment, the system automatically:
 3. Rejects the appointment if the doctor is not available
 4. Returns a clear error message if validation fails
 
-**Error Response:**
-```json
-{
-  "status": "400",
-  "error": "Availability Error",
-  "message": "Doctor is not available at the requested time. Please check doctor's availability schedule.",
-  "timestamp": "2025-10-26T10:30:00"
-}
-```
 
 ### Days of Week
 
@@ -494,6 +443,239 @@ Times should be in ISO-8601 format: `HH:mm:ss` (e.g., "09:00:00", "17:30:00")
   }
 ]
 ```
+
+## Search and Filter Features
+
+The telemedicine platform provides comprehensive search and filtering capabilities for doctors, patients, and appointments.
+
+### Doctor Search
+
+Search for doctors using multiple criteria. All parameters are optional and can be combined.
+
+**Endpoint**: `GET /search/doctors`
+
+**Authentication**: Required (all authenticated users)
+
+#### Available Parameters
+
+| Parameter             | Type        | Description                                      | Example                      |
+|-----------------------|-------------|--------------------------------------------------|------------------------------|
+| `specialization`      | String      | Partial match on specialization                  | `Cardiology`, `Derma`        |
+| `minFee`              | BigDecimal  | Minimum consultation fee                         | `50.00`                      |
+| `maxFee`              | BigDecimal  | Maximum consultation fee                         | `200.00`                     |
+| `minExperience`       | Integer     | Minimum years of experience                      | `5`                          |
+| `isVerified`          | Boolean     | Verification status                              | `true`, `false`              |
+| `availableDay`        | DayOfWeek   | Day of week availability                         | `MONDAY`, `FRIDAY`           |
+| `availableStartTime`  | Time        | Availability start time (HH:mm)                  | `09:00`, `14:30`             |
+| `availableEndTime`    | Time        | Availability end time (HH:mm)                    | `17:00`, `18:00`             |
+| `name`                | String      | Partial match on first or last name              | `John`, `Smith`              |
+
+#### Example Requests
+
+##### Search for cardiologists
+
+```bash
+GET /search/doctors?specialization=Cardiology
+```
+
+##### Search for verified doctors with 10+ years experience
+
+```bash
+GET /search/doctors?isVerified=true&minExperience=10
+```
+
+##### Search for doctors with consultation fee between $50-$150
+
+```bash
+GET /search/doctors?minFee=50&maxFee=150
+```
+
+##### Search for doctors available on Monday 9am-5pm
+
+```bash
+GET /search/doctors?availableDay=MONDAY&availableStartTime=09:00&availableEndTime=17:00
+```
+
+##### Search by name
+
+```bash
+GET /search/doctors?name=Smith
+```
+
+#### Response Example
+
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@hospital.com",
+    "phoneNumber": "+1234567890",
+    "specialization": "Cardiology",
+    "yearsOfExperience": 15,
+    "consultationFee": 150.00,
+    "isVerified": true
+  }
+]
+```
+
+### Patient Search (Admin Only)
+
+Advanced patient search with multiple filters. Only accessible by administrators.
+
+#### Available Parameters
+
+| Parameter     | Type    | Description                           | Example              |
+|---------------|---------|---------------------------------------|----------------------|
+| `name`        | String  | Partial match on first or last name   | `Jane`, `Doe`        |
+| `email`       | String  | Partial match on email address        | `patient@test.com`   |
+| `bloodType`   | String  | Exact match on blood type             | `A+`, `O-`, `AB+`    |
+| `isActive`    | Boolean | Filter by active status               | `true`, `false`      |
+| `phoneNumber` | String  | Partial match on phone number         | `+1234`, `555-0100`  |
+
+#### Example Requests
+
+##### Search patients by name
+
+```bash
+GET /search/patients?name=Jane
+```
+
+##### Search by blood type
+
+```bash
+GET /search/patients?bloodType=A+
+```
+
+##### Search by email
+
+```bash
+GET /search/patients?email=patient@test.com
+```
+
+##### Search for inactive patients
+
+```bash
+GET /search/patients?isActive=false
+```
+
+##### Combine multiple criteria
+
+```bash
+GET /search/patients?bloodType=O-&isActive=true
+```
+
+#### Response Example
+
+```json
+[
+  {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane.doe@email.com",
+    "phoneNumber": "+9876543210",
+    "bloodType": "A+",
+    "allergies": ["Penicillin", "Peanuts"],
+    "emergencyContactName": "John Doe",
+    "emergencyContactPhone": "+1111111111",
+    "isActive": true,
+    "createdAt": "2025-01-15"
+  }
+]
+```
+
+### Appointment Filtering
+
+Filter appointments by various criteria. Results are ordered by scheduled date (most recent first).
+
+**Endpoint**: `GET /search/appointments`
+
+**Authentication**: Required (all authenticated users)
+
+#### Available Parameters
+
+| Parameter   | Type              | Description                                | Example                      |
+|-------------|-------------------|--------------------------------------------|------------------------------|
+| `patientId` | UUID              | Filter by specific patient                 | `550e8400-e29b-41d4-...`     |
+| `doctorId`  | UUID              | Filter by specific doctor                  | `660e8400-e29b-41d4-...`     |
+| `status`    | AppointmentStatus | Filter by appointment status               | `SCHEDULED`, `COMPLETED`     |
+| `startDate` | Date (yyyy-MM-dd) | Filter appointments from this date         | `2025-01-01`                 |
+| `endDate`   | Date (yyyy-MM-dd) | Filter appointments until this date        | `2025-12-31`                 |
+
+#### Appointment Statuses
+
+- `SCHEDULED` - Appointment is scheduled
+- `CONFIRMED` - Appointment has been confirmed
+- `COMPLETED` - Appointment has been completed
+- `CANCELLED` - Appointment has been cancelled
+
+#### Example Requests
+
+##### Get all scheduled appointments
+
+```bash
+GET /search/appointments?status=SCHEDULED
+```
+
+##### Get appointments for a specific patient
+
+```bash
+GET /search/appointments?patientId=550e8400-e29b-41d4-a716-446655440000
+```
+
+##### Get appointments for a specific doctor
+
+```bash
+GET /search/appointments?doctorId=660e8400-e29b-41d4-a716-446655440000
+```
+
+##### Filter appointments by date range
+
+```bash
+GET /search/appointments?startDate=2025-01-01&endDate=2025-01-31
+```
+
+##### Get completed appointments for a patient in a date range
+
+```bash
+GET /search/appointments?patientId=550e8400-e29b-41d4-a716-446655440000&status=COMPLETED&startDate=2025-01-01&endDate=2025-12-31
+```
+
+##### Get all appointments for today
+
+```bash
+GET /search/appointments?startDate=2025-11-03&endDate=2025-11-03
+```
+
+#### Response Example
+
+```json
+[
+  {
+    "patientFirstName": "Jane",
+    "patientLastName": "Doe",
+    "doctorFirstName": "John",
+    "doctorLastName": "Smith",
+    "scheduledDate": "2025-11-05",
+    "scheduledTime": "10:00:00",
+    "durationInMinutes": 30,
+    "status": "SCHEDULED"
+  }
+]
+```
+
+### Key Features
+
+- ✅ **Case-Insensitive**: All text searches are case-insensitive
+- ✅ **Partial Matching**: Name, email, and specialization support partial matches
+- ✅ **Optional Parameters**: All search parameters are optional
+- ✅ **Combinable Filters**: Mix and match multiple criteria for precise results
+- ✅ **Performance**: Uses JPA Criteria API for optimized database queries
+- ✅ **Security**: Role-based access control on all endpoints
+- ✅ **Availability Check**: Real-time doctor availability verification
+- ✅ **Date Range Filtering**: Flexible date-based appointment filtering
 
 ## Testing
 
