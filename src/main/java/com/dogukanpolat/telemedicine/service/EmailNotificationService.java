@@ -17,19 +17,26 @@ public class EmailNotificationService {
 
     private final JavaMailSender mailSender;
 
-    @Async
+    //@Async
     public void sendAppointmentConfirmation(Appointment appointment) {
+        log.info("📧 Starting email sending process for appointment: {}", appointment.getId());
         try {
+
+            String patientEmail = appointment.getPatient().getUser().getEmail();
+            String doctorEmail = appointment.getDoctor().getUser().getEmail();
+
+            log.info("📨 Sending to patient: {}", patientEmail);
+            log.info("📨 Sending to doctor: {}", doctorEmail);
             // Email to patient
             sendEmail(
-                    appointment.getPatient().getUser().getEmail(),
+                    patientEmail,
                     "Appointment Confirmation",
                     buildPatientConfirmationMessage(appointment)
             );
 
             // Email to doctor
             sendEmail(
-                    appointment.getDoctor().getUser().getEmail(),
+                    doctorEmail,
                     "New Appointment Scheduled",
                     buildDoctorNotificationMessage(appointment)
             );
@@ -40,17 +47,24 @@ public class EmailNotificationService {
         }
     }
 
-    @Async
+    //@Async
     public void sendAppointmentCancellation(Appointment appointment) {
+        log.info("📧 Starting email sending process for appointment: {}", appointment.getId());
         try {
+            String patientEmail = appointment.getPatient().getUser().getEmail();
+            String doctorEmail = appointment.getDoctor().getUser().getEmail();
+
+            log.info("📨 Sending to patient: {}", patientEmail);
+            log.info("📨 Sending to doctor: {}", doctorEmail);
+
             sendEmail(
-                    appointment.getPatient().getUser().getEmail(),
+                    patientEmail,
                     "Appointment Cancelled",
                     buildCancellationMessage(appointment)
             );
 
             sendEmail(
-                    appointment.getDoctor().getUser().getEmail(),
+                    doctorEmail,
                     "Appointment Cancelled",
                     buildCancellationMessage(appointment)
             );
