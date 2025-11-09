@@ -5,13 +5,17 @@ import com.dogukanpolat.telemedicine.dto.appointment.AppointmentResponseDto;
 import com.dogukanpolat.telemedicine.exception.AvailabilityException;
 import com.dogukanpolat.telemedicine.mappers.AppointmentMapper;
 import com.dogukanpolat.telemedicine.model.Appointment;
+import com.dogukanpolat.telemedicine.model.Doctor;
+import com.dogukanpolat.telemedicine.model.Patient;
 import com.dogukanpolat.telemedicine.model.enums.AppointmentStatus;
 import com.dogukanpolat.telemedicine.model.enums.DayOfWeek;
 import com.dogukanpolat.telemedicine.repository.AppointmentRepository;
 import com.dogukanpolat.telemedicine.repository.DoctorRepository;
 import com.dogukanpolat.telemedicine.repository.PatientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalTime;
@@ -36,7 +40,13 @@ public class AppointmentService {
         return appointmentRepository.findByDoctorId(id).stream().map(appointmentMapper::toAppointmentResponseDto).toList();
     }
 
+    @Transactional
     public AppointmentResponseDto createAppointment(AppointmentRequestDto appointmentRequest) {
+        Patient patient = patientRepository.findById(appointmentRequest.patientId())
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+        Doctor doctor = doctorRepository.findById(appointmentRequest.doctorId())
+                .orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
+
         DayOfWeek dayOfWeek = DayOfWeek.valueOf(appointmentRequest.scheduledDate().getDayOfWeek().name());
         LocalTime endTime = appointmentRequest.scheduledTime().plusMinutes(appointmentRequest.durationMinutes());
 
@@ -52,10 +62,10 @@ public class AppointmentService {
         }
 
         Appointment appointment = appointmentMapper.toAppointment(appointmentRequest);
-        appointment.setId(UUID.randomUUID());
-        appointment.setPatient(patientRepository.findById(appointmentRequest.patientId()).orElseThrow());
-        appointment.setDoctor(doctorRepository.findById(appointmentRequest.doctorId()).orElseThrow());
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
         appointment.setCreatedAt(Instant.now());
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
         Appointment saved = appointmentRepository.save(appointment);
         emailService.sendAppointmentConfirmation(saved);
         return appointmentMapper.toAppointmentResponseDto(saved);
@@ -69,6 +79,9 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Appointment cannot be null"));
         appointment.setStatus(status);
         Appointment saved = appointmentRepository.save(appointment);
+        if (status == AppointmentStatus.CANCELLED) {
+            emailService.sendAppointmentCancellation(saved);
+        }
         return appointmentMapper.toAppointmentResponseDto(saved);
     }
 }
