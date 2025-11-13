@@ -1,5 +1,6 @@
 package com.dogukanpolat.telemedicine.service;
 
+import com.dogukanpolat.telemedicine.dto.notification.NotificationLogResponseDto;
 import com.dogukanpolat.telemedicine.dto.notification.PushNotificationDto;
 import com.dogukanpolat.telemedicine.mappers.NotificationMapper;
 import com.dogukanpolat.telemedicine.model.Appointment;
@@ -270,11 +271,13 @@ public class NotificationService {
         );
     }
 
-    public List<NotificationLog> getUserNotificationHistory(UUID userId) {
-        return logRepository.findByUserId(userId);
+    public List<NotificationLogResponseDto> getUserNotificationHistory(UUID userId) {
+        List<NotificationLog> logs = logRepository.findByUserId(userId);
+        return logs.stream().map(notificationMapper::toLogDto).toList();
     }
 
-    public List<NotificationLog> getFailedNotifications(UUID userId) {
-        return logRepository.findByUserIdAndStatus(userId, NotificationStatus.FAILED);
+    public List<NotificationLogResponseDto> getFailedNotifications(UUID userId) {
+        List<NotificationLog> logs = logRepository.findByUserIdAndStatus(userId, NotificationStatus.FAILED);
+        return logs.stream().map(notificationMapper::toLogDto).toList();
     }
 }
