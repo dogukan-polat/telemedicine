@@ -50,4 +50,7 @@ public class UserModel {
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
+    @Column(name = "device_token")
+    private String deviceToken;
+
 }

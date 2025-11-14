@@ -196,10 +196,23 @@ public class NotificationService {
             String recipient = getRecipient(user, channel);
             notificationLog.setRecipient(recipient);
 
-            // TODO: For now device token for push notifications is empty. It will be filled later.
             boolean success = switch (channel) {
                 case EMAIL -> emailService.sendEmail(recipient, subject, content);
-                case PUSH -> pushService.sendPushNotification(new PushNotificationDto("", user.getId(), subject, content));
+                case PUSH -> {
+                    String deviceToken = user.getDeviceToken();
+                    if (deviceToken == null || deviceToken.isEmpty()) {
+                        log.warn("No device token found for user: {}", user.getId());
+                        yield false;
+                    }
+
+                    PushNotificationDto pushDto = new PushNotificationDto(
+                            deviceToken,
+                            user.getId(),
+                            subject,
+                            content
+                    );
+                    yield pushService.sendPushNotification(pushDto);
+                }
             };
 
             if (success) {

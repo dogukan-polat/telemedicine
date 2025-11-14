@@ -1,6 +1,7 @@
 package com.dogukanpolat.telemedicine.controller;
 
 import com.dogukanpolat.telemedicine.dto.user.*;
+import com.dogukanpolat.telemedicine.model.UserModel;
 import com.dogukanpolat.telemedicine.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,10 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -107,5 +107,15 @@ public class UserController {
     public ResponseEntity<Void> registerAdmin(@Valid @RequestBody UserRegistrationDto userRegistrationDto) {
         userService.registerAdmin(userRegistrationDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Update device token for push notifications")
+    @PatchMapping("/{userId}/device-token")
+    public ResponseEntity<Void> updateDeviceToken(
+            @PathVariable UUID userId,
+            @Valid @RequestBody DeviceTokenUpdateDto dto
+    ) {
+        userService.updateDeviceToken(dto.deviceToken(), userId);
+        return ResponseEntity.ok().build();
     }
 }

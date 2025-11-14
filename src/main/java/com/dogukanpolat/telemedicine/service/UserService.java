@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +58,13 @@ public class UserService {
             throw new BadCredentialsException("Only admin can register");
         }
         registerUser(userRegistrationDto, Role.ADMIN);
+    }
+
+    public void updateDeviceToken(String deviceToken, UUID userId) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setDeviceToken(deviceToken);
+        userRepository.save(user);
     }
 
     //Helper methods
