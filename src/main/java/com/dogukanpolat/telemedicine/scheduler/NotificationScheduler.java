@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Component
@@ -93,8 +94,9 @@ public class NotificationScheduler {
         log.info("Running notification logs cleanup scheduler");
 
         try {
-            // TODO: Implement cleanup logic
-            // Archive or delete notification logs older than 90 days
+            OffsetDateTime cutoff = OffsetDateTime.now().minusDays(7);
+
+            notificationService.cleanUp(cutoff);
 
             log.info("Notification logs cleanup completed");
         } catch (Exception e) {

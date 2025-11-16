@@ -4,6 +4,7 @@ import com.dogukanpolat.telemedicine.model.NotificationLog;
 import com.dogukanpolat.telemedicine.model.enums.NotificationStatus;
 import com.dogukanpolat.telemedicine.model.enums.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -20,10 +21,9 @@ public interface NotificationLogRepository extends JpaRepository<NotificationLog
 
     List<NotificationLog> findByAppointmentId(UUID appointmentId);
 
-    @Query("SELECT nl FROM NotificationLog nl WHERE nl.status = :status " +
-            "AND nl.createdAt < :before")
-    List<NotificationLog> findPendingNotificationsOlderThan(
-            NotificationStatus status,
+    @Modifying
+    @Query("DELETE FROM NotificationLog nl WHERE nl.createdAt < :before ")
+    List<NotificationLog> deletePendingNotificationsOlderThan(
             OffsetDateTime before
     );
 

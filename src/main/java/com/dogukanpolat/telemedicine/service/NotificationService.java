@@ -182,6 +182,10 @@ public class NotificationService {
         sendNotification(user, NotificationType.PRESCRIPTION_READY, subject, content, null);
     }
 
+    public void cleanUp(OffsetDateTime olderThan) {
+        logRepository.deletePendingNotificationsOlderThan(olderThan);
+    }
+
     private void sendThroughChannel(
             UserModel user,
             NotificationType type,
