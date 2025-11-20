@@ -11,6 +11,7 @@ A comprehensive telemedicine platform API built with Spring Boot that enables se
 - 📧 **Email Notifications** - Automated email notifications for appointments
 - 📊 **Admin Dashboard** - System statistics and audit trail management
 - 🔍 **Search Doctors, Patients & Appointments** - Search doctors, patients and appointments by properties
+- 🔔 **Notification Alerts** - Receive real-time appointment status updates via email and push notifications
 - 📝 **API Documentation** - Interactive Swagger/OpenAPI documentation
 
 ## Tech Stack
@@ -21,6 +22,7 @@ A comprehensive telemedicine platform API built with Spring Boot that enables se
 - **Security**: Spring Security with JWT (jjwt 0.13.0)
 - **AI Integration**: Google Gemini API 1.23.0
 - **Email**: Spring Boot Starter Mail (Gmail SMTP)
+- **Push Notifications**: Firebase Cloud Messaging
 - **Migration**: Flyway 11.13.1
 - **Mapping**: MapStruct 1.6.3
 - **Validation**: Spring Boot Starter Validation
@@ -197,6 +199,19 @@ Once the application is running, visit:
 | GET    | `/search/patients`     | Search patients by name, blood type...         | ADMIN         |
 | GET    | `/search/appointments` | Search appointments by doctor & patient IDs... | Authenticated |
 
+### Notifications Endpoints
+
+| Method | Endpoint                                               | Description                                        | Role          |
+|--------|--------------------------------------------------------|----------------------------------------------------|---------------|
+| GET    | `/notifications/preferences/user/{userId}`             | Get user notification preferences                  | Authenticated |
+| PATCH  | `/notifications/preferences/user/{userId}`             | Update a single notification preference for a user | Authenticated |
+| PATCH  | `/notifications/preferences/user/{userId}/bulk`        | Update multiple notification preferences           | Authenticated |
+| POST   | `/notifications/preferences/user/{userId}/initialize`  | Initialize default notification preferences        | Authenticated |
+| PATCH  | `/notifications/preferences/user/{userId}/disable-all` | Disable all notifications                          | Authenticated |
+| PATCH  | `/notifications/preferences/user/{userId}/enable-all`  | Enable all notifications                           | Authenticated |
+| GET    | `/notifications/history/user/{userId}`                 | Retrieve notification history for a user           | Authenticated |
+| GET    | `/notifications/history/user/{userId}/failed`          | Retrieve failed notification history for a user    | Authenticated |
+
 ## User Roles
 
 ### PATIENT
@@ -223,11 +238,12 @@ The application uses Flyway migrations to manage the database schema. The follow
 
 ### Core Tables
 
-**users** (V1__initial_migration.sql)
+**users** (V1__initial_migration.sql, V7__add_device_token_to_users.sql)
 - Core user information for all user types
 - Fields: id (UUID), email, password (encrypted), role, first_name, last_name, phone_number, is_active, created_at, updated_at
 - Unique constraint on email
 - Uses UUID extension for primary keys
+- Device token is optional, but recommended for push notifications(Firebase Cloud Messaging)
 
 **patients** (V2__add_patients_and_doctors.sql)
 - Patient-specific data
@@ -259,6 +275,29 @@ The application uses Flyway migrations to manage the database schema. The follow
 - Time format: HH:mm:ss
 - Unique constraint on doctor_id & day_of_week
 - CASCADE delete on doctor deletion
+
+**notifications_preferences** (V6__add_notification_related_entities.sql)
+- User notification preferences
+- Fields: id (UUID), user_id (FK), notification_type, channel, is_enabled, created_at, updated_at
+- Notification types: APPOINTMENT_CONFIRMED, APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H,
+  APPOINTMENT_CANCELLATION, APPOINTMENT_RESCHEDULED, LAB_RESULTS_READY,
+  PRESCRIPTION_REFILL_REMINDER, PRESCRIPTION_READY, ACCOUNT_VERIFICATION,
+  PASSWORD_RESET, GENERAL_ANNOUNCEMENT
+- Channel values: EMAIL, PUSH
+- CASCADE delete on user deletion
+
+**notification_logs** (V6__add_notification_related_entities.sql)
+- Notification history and logs
+- Fields: id (UUID), user_id (FK), notification_type, channel, status, recipient, subject, content,
+error_message, sent_at, created_at, appointment_id
+- Notification types: APPOINTMENT_CONFIRMED, APPOINTMENT_REMINDER_24H, APPOINTMENT_REMINDER_1H,
+  APPOINTMENT_CANCELLATION, APPOINTMENT_RESCHEDULED, LAB_RESULTS_READY,
+  PRESCRIPTION_REFILL_REMINDER, PRESCRIPTION_READY, ACCOUNT_VERIFICATION,
+  PASSWORD_RESET, GENERAL_ANNOUNCEMENT
+- Channel values: EMAIL, PUSH
+- Notification status values: PENDING, SENT, FAILED, CANCELLED
+- Recipient values are user emails
+- CASCADE delete on appointment deletion or user deletion
 
 ### Database Relationships
 
@@ -295,13 +334,14 @@ telemedicine/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/dogukanpolat/telemedicine/
-│   │   │       ├── config/            # Configuration(Swagger UI)
+│   │   │       ├── config/            # Configuration(Swagger UI, Firebase, Scheduling)
 │   │   │       ├── controller/        # REST controllers
 │   │   │       ├── dto/               # Data Transfer Objects
 │   │   │       ├── exception/         # Custom exceptions
 │   │   │       ├── mappers/           # MapStruct mappers
 │   │   │       ├── model/             # JPA entities
 │   │   │       ├── repository/        # Spring Data repositories
+│   │   │       ├── scheduler/         # Scheduler tasks
 │   │   │       ├── security/          # Security configuration
 │   │   │       └── service/           # Business logic
 │   │   └── resources/
