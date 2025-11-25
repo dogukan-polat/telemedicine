@@ -25,3 +25,7 @@ jwt:
 
 gemini:
   api-key: ${GEMINI_API_KEY}
+
+file:
+  encryption:
+    secret: ${ENCRYPTION_KEY}
