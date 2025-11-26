@@ -29,3 +29,4 @@ gemini:
 file:
   encryption:
     secret: ${ENCRYPTION_KEY}
+  upload-dir: ${UPLOAD_DIR}
